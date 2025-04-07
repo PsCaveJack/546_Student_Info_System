@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -95,6 +96,12 @@ export default function Home() {
           />
           Go to nextjs.org →
         </a>
+        <Link
+          href="/create-user"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          Go to Create User Page
+        </Link>
       </footer>
     </div>
   );
