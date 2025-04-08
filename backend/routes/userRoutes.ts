@@ -1,26 +1,27 @@
-const express = require('express');
+import express, { Request, Response } from 'express';
+import User, { IUser } from '../models/User';
+
 const router = express.Router();
-const User = require('../models/User');
 
 // GET /api/users - Get all users
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
-    const users = await User.find();
+    const users: IUser[] = await User.find();
     res.json(users);
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
 // POST /api/users - Create new user
-router.post('/', async (req, res) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     const newUser = new User(req.body);
     const saved = await newUser.save();
     res.status(201).json(saved);
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
 });
 
-module.exports = router;
+export default router;
