@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node server.ts"
+    "setup": "cp /home/ubuntu/homework/CPSC546/homework_1/backend/.env .env",
+    "dev": "npm run setup && ts-node server.ts"
   },
   "keywords": [],
   "author": "",
