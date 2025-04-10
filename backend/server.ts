@@ -36,7 +36,7 @@ app.use('/api/registrations', registrationRoutes);
 app.use('/api/majors', majorRoutes);
 
 // Start the server
-const PORT = process.env.PORT || 5000;
+const PORT = process.argv[2] || process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
