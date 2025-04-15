@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import styles from "../account-control/AccountControl.module.css";
+import styles from "./styles/AddUserForm.module.css";
 
+//Define data needed to create AdduserForm
 interface UserFormData {
   username: string;
   email: string;
@@ -16,11 +17,24 @@ interface Props {
   newUser: UserFormData;
   onChange: (field: keyof UserFormData, value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
+  successMessage?: string;
 }
 
-export default function AddUserForm({ newUser, onChange, onSubmit }: Props) {
+export default function AddUserForm({
+  newUser,
+  onChange,
+  onSubmit,
+  successMessage,
+}: Props) {
+
+
+  //UI
   return (
-    <form onSubmit={onSubmit} className={styles.formContainer}>
+    <form onSubmit={onSubmit} className={styles.modalForm}>
+      <h2 className={styles.formTitle}>Create User</h2>
+
+      {successMessage && <p className={styles.successMsg}>{successMessage}</p>}
+
       <input
         className={styles.input}
         type="text"
@@ -72,7 +86,9 @@ export default function AddUserForm({ newUser, onChange, onSubmit }: Props) {
         <option value="professor">Professor</option>
         <option value="admin">Admin</option>
       </select>
-      <button type="submit" className={styles.button}>Create User</button>
+      <button type="submit" className={styles.button}>
+        Create User
+      </button>
     </form>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
-import styles from "../account-control/AccountControl.module.css";
+import styles from "./styles/UserTable.module.css";
 
+//Information a user account should contain
 interface User {
   _id: string;
   username: string;
@@ -11,7 +12,7 @@ interface User {
   lastName?: string;
   password?: string;
 }
-
+//Set return type to void
 interface Props {
   users: User[];
   onRoleChange: (userId: string, newRole: User["role"]) => void;
@@ -25,6 +26,8 @@ export default function UserTable({
   onDeleteUser,
   onResetPassword,
 }: Props) {
+
+  //UI
   return (
     <table className={styles.userTable}>
       <thead>
@@ -56,8 +59,8 @@ export default function UserTable({
               </select>
             </td>
             <td>
-              <button className={styles.deleteButton} onClick={() => onDeleteUser(user._id)}>Delete</button>
               <button className={styles.resetButton} onClick={() => onResetPassword(user._id)}>Reset Password</button>
+              <button className={styles.deleteButton} onClick={() => onDeleteUser(user._id)}>Delete</button>
             </td>
           </tr>
         ))}

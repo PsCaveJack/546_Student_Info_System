@@ -1,13 +1,14 @@
 import { User } from "./page";
 
-// .env.local is present then use port number that's in there, if not, fallback to use localhost:5000
+// if .env.local is present then use port number that's in there, else fallback to use port 5000
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
 
-// Fetch all users
+// Fetch all users from backend
 export const fetchUsers = async (
   setUsers: React.Dispatch<React.SetStateAction<User[]>>
 ) => {
   try {
+    // ${API_BASE} was http://localhost:5000/api, changed to this because of the fallback design
     const res = await fetch(`${API_BASE}/users`);
     if (!res.ok) throw new Error("Failed to fetch users");
 
