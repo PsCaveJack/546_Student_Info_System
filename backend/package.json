@@ -1,10 +1,10 @@
 {
-  "name": "backend",
+     "name": "backend",
   "version": "1.0.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "setup": "cp /home/ubuntu/homework/CPSC546/homework_1/backend/.env .env",
-    "dev": "npm run setup && ts-node server.ts"
+     "test": "echo \"Error: no test specified\" && exit 1",
+    "setup": "if [ ! -f .env ]; then cp /home/ubuntu/homework/CPSC546/homework_1/backend/.env .env; fi",
+      "dev": "npm run setup && ts-node server.ts"
   },
   "keywords": [],
   "author": "",
