@@ -1,7 +1,7 @@
 import { User } from "./page";
 
 // if .env.local is present then use port number that's in there, else fallback to use port 5000
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5050/api";
 
 // Fetch all users from backend
 export const fetchUsers = async (
