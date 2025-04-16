@@ -1,4 +1,5 @@
 backend/.env
+backend/routes/.env
 backend/node_modules/
 
 
