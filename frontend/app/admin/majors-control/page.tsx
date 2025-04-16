@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./MajorsControl.module.css";
 
 type Major = {
   name: string;
   requirements: string[];
+  electives: string[];
 };
 
 export default function MajorRequirementAdminPage() {
@@ -13,16 +14,42 @@ export default function MajorRequirementAdminPage() {
   const [majorForm, setMajorForm] = useState<Major>({
     name: "",
     requirements: [],
+    electives: [],
   });
   const [requirementInput, setRequirementInput] = useState<string>("");
+  const [electiveInput, setElectiveInput] = useState<string>("");
 
-  // Handle input changes
+  useEffect(() => {
+    const fetchMajors = async () => {
+      try {
+        const response = await fetch("http://localhost:5005/api/majors");
+        const data = await response.json();
+
+        const transformedMajors = data.map((item: any) => ({
+          name: item.majorName,
+          requirements: item.requiredCourses,
+          electives: item.electives || [],
+        }));
+
+        setMajors(transformedMajors);
+      } catch (error) {
+        console.error("Failed to fetch majors:", error);
+      }
+    };
+
+    fetchMajors();
+  }, []);
+
   const handleMajorNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMajorForm({ ...majorForm, name: e.target.value });
   };
 
   const handleRequirementInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRequirementInput(e.target.value);
+  };
+
+  const handleElectiveInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setElectiveInput(e.target.value);
   };
 
   const addRequirement = () => {
@@ -37,6 +64,18 @@ export default function MajorRequirementAdminPage() {
     setRequirementInput("");
   };
 
+  const addElective = () => {
+    if (!electiveInput.trim()) {
+      alert("Elective cannot be empty.");
+      return;
+    }
+    setMajorForm({
+      ...majorForm,
+      electives: [...majorForm.electives, electiveInput.trim()],
+    });
+    setElectiveInput("");
+  };
+
   const handleCreateMajor = async () => {
     if (!majorForm.name.trim() || majorForm.requirements.length === 0) {
       alert("Please provide a Major name and at least one requirement.");
@@ -44,24 +83,34 @@ export default function MajorRequirementAdminPage() {
     }
 
     try {
-      // Send the data to the API route
-      const response = await fetch("/api/majors", {
+      const newMajor = {
+        majorName: majorForm.name,
+        requiredCourses: majorForm.requirements,
+        electives: majorForm.electives,
+      };
+
+      const response = await fetch("http://localhost:5005/api/majors", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(majorForm),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newMajor),
       });
 
       if (response.ok) {
-        const data = await response.json();
-        alert("Major created successfully!");
-        // Optionally, update the list of majors after successful creation
-        setMajors((prev) => [...prev, data.data]);
+        const savedMajor = await response.json();
 
-        // Reset the form
-        setMajorForm({ name: "", requirements: [] });
+        setMajors((prev) => [
+          ...prev,
+          {
+            name: savedMajor.majorName,
+            requirements: savedMajor.requiredCourses,
+            electives: savedMajor.electives || [],
+          },
+        ]);
+
+        alert("Major created successfully!");
+        setMajorForm({ name: "", requirements: [], electives: [] });
         setRequirementInput("");
+        setElectiveInput("");
       } else {
         const errorData = await response.json();
         alert(errorData.error || "Failed to create major");
@@ -81,7 +130,7 @@ export default function MajorRequirementAdminPage() {
 
   return (
     <div className={styles.container}>
-      <h1>🎓 Admin: Create Majors & Requirements</h1>
+      <h1>🎓 Admin: Create Majors, Requirements & Electives</h1>
 
       {/* Major Creation Form */}
       <div className={styles.formBox}>
@@ -117,6 +166,28 @@ export default function MajorRequirementAdminPage() {
             </ul>
           </div>
 
+          <div className={styles.requirementBox}>
+            <input
+              name="elective"
+              placeholder="Add Elective"
+              value={electiveInput}
+              onChange={handleElectiveInputChange}
+              className={styles.input}
+            />
+            <button onClick={addElective} className={styles.button}>
+              ➕ Add Elective
+            </button>
+          </div>
+
+          <div>
+            <h4>Current Electives:</h4>
+            <ul>
+              {majorForm.electives.map((elec, index) => (
+                <li key={index}>🎈 {elec}</li>
+              ))}
+            </ul>
+          </div>
+
           <button onClick={handleCreateMajor} className={styles.button}>
             🎯 Create Major
           </button>
@@ -134,6 +205,7 @@ export default function MajorRequirementAdminPage() {
               <tr>
                 <th className={styles.th}>Major Name</th>
                 <th className={styles.th}>Requirements</th>
+                <th className={styles.th}>Electives</th>
                 <th className={styles.th}>Actions</th>
               </tr>
             </thead>
@@ -145,6 +217,13 @@ export default function MajorRequirementAdminPage() {
                     <ul>
                       {major.requirements.map((req, i) => (
                         <li key={i}>{req}</li>
+                      ))}
+                    </ul>
+                  </td>
+                  <td className={styles.td}>
+                    <ul>
+                      {major.electives.map((elec, i) => (
+                        <li key={i}>{elec}</li>
                       ))}
                     </ul>
                   </td>
