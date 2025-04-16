@@ -1,179 +1,132 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import styles from "./AccountControl.module.css";
-import mockUsers from "./mock-users.json";
+import styles from "./styles/page.module.css";
+import UserTable from "./UserTable";
+import AddUserForm from "./AddUserForm";
 
-type User = {
-  name: string;
+import {
+  fetchUsers,
+  updateUserRole,
+  resetUserPassword,
+  deleteUser,
+  createUser,
+} from "./userHandlers";
+
+//information a user account should contain
+export interface User {
+  _id: string;
+  username: string;
   email: string;
+  role: "admin" | "student" | "professor";
+  firstName?: string;
+  lastName?: string;
   password?: string;
-  role: "student" | "teacher" | "admin";
-  status: "active" | "blocked";
-};
-
+}
+//Frontend functions
 export default function AccountControlPage() {
+  //stores the list of user fetched from backend
   const [users, setUsers] = useState<User[]>([]);
-  const [form, setForm] = useState<User>({
-    name: "",
+
+  //stores new user created from AdduserForm
+  const [newUser, setNewUser] = useState<Omit<User, "_id">>({
+    firstName: "",
+    lastName: "",
     email: "",
+    username: "",
     password: "",
     role: "student",
-    status: "active"
   });
 
-  // Load mock users on mount
+  const [showForm, setShowForm] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  //Fetch
   useEffect(() => {
-    setUsers(mockUsers as User[]) ;
+    fetchUsers(setUsers);
   }, []);
-
-  // Form logic
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  //Updates role
+  const handleRoleChange = (userId: string, newRole: User["role"]) => {
+    updateUserRole(userId, newRole, setUsers);
+  };
+  //Resets password
+  const handleResetPassword = (userId: string) => {
+    resetUserPassword(userId);
+  };
+  //Delete
+  const handleDeleteUser = (userId: string) => {
+    deleteUser(userId, setUsers);
+  };
+  //AddUserForm
+  const handleAddUser = (e: React.FormEvent) => {
+    createUser(e, newUser, setUsers, () => {
+      setNewUser({
+        firstName: "",
+        lastName: "",
+        email: "",
+        username: "",
+        password: "",
+        role: "student",
+      });
+      setShowForm(false);
+      setSuccessMessage("✅ User created successfully!");
+      setTimeout(() => setSuccessMessage(""), 3000); 
+    });
   };
 
-  const handleCreateUser = () => {
-    if (!form.name || !form.email || !form.password) {
-      alert("Please fill in all fields.");
-      return;
-    }
 
-    const newUser: User = {
-      name: form.name,
-      email: form.email,
-      password: form.password,
-      role: form.role,
-      status: "active"
-    };
-
-    setUsers([...users, newUser]);
-    setForm({ name: "", email: "", password: "", role: "student", status: "active" });
-    alert("User added (mock)");
-  };
-
-  // Feature handlers
-  const deleteUser = (email: string) => {
-    setUsers((prev) => prev.filter((u) => u.email !== email));
-  };
-
-  const changeUserRole = (email: string, newRole: string) => {
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.email === email ? { ...u, role: newRole as User["role"] } : u
-      )
-    );
-  };
-
-  const resetPassword = (email: string) => {
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.email === email ? { ...u, password: "new-password123" } : u
-      )
-    );
-    alert(`Password for ${email} reset to: new-password123 (mock)`);
-  };
-
-  const toggleBlock = (email: string) => {
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.email === email
-          ? { ...u, status: u.status === "active" ? "blocked" : "active" }
-          : u
-      )
-    );
-  };
-
+  //UI
   return (
     <div className={styles.container}>
-      <h1>👤 Admin Account Control</h1>
+      <h1 className={styles.title}>Admin/Account Control Page</h1>
 
-      {/* Create User Form */}
-      <div className={styles.formBox}>
-        <h2>Create New User</h2>
-        <div className={styles.formGroup}>
-          <input
-            name="name"
-            placeholder="Full Name"
-            value={form.name}
-            onChange={handleInputChange}
-            className={styles.input}
-          />
-          <input
-            name="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleInputChange}
-            className={styles.input}
-          />
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleInputChange}
-            className={styles.input}
-          />
-          <select
-            name="role"
-            value={form.role}
-            onChange={handleInputChange}
-            className={styles.select}
-          >
-            <option value="student">Student</option>
-            <option value="teacher">Teacher</option>
-            <option value="admin">Admin</option>
-          </select>
-          <button onClick={handleCreateUser} className={styles.button}>
-            ➕ Create User
-          </button>
+      {successMessage && (
+        <div className={styles.successToast}>{successMessage}</div>
+      )}
+
+    <div className={styles.topHeaderRow}>
+
+      <h2 className={styles.sectionTitle}>Existing Users</h2>
+
+      <button className={styles.createButton} onClick={() => setShowForm(true)}>
+        + Create User
+      </button>
+
+    </div>
+
+      <UserTable
+        users={users}
+        onRoleChange={handleRoleChange}
+        onResetPassword={handleResetPassword}
+        onDeleteUser={handleDeleteUser}
+      />
+
+
+      <div className={styles.inlineAddButtonWrapper}>
+        <button
+          className={styles.inlineAddButton}
+          onClick={() => setShowForm(true)}
+        >
+          + Create User
+        </button>
+      </div>
+
+      {showForm && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <button className={styles.closeButton} onClick={() => setShowForm(false)}>
+              ✕
+            </button>
+            <AddUserForm
+              newUser={newUser}
+              onChange={(field, value) =>
+                setNewUser((prev) => ({ ...prev, [field]: value }))
+              }
+              onSubmit={handleAddUser}
+            />
+          </div>
         </div>
-      </div>
-
-      {/* User Table */}
-      <div>
-        <h2>Existing Users</h2>
-        <table className={styles.table}>
-          <thead className={styles.thead}>
-            <tr>
-              <th className={styles.th}>Name</th>
-              <th className={styles.th}>Email</th>
-              <th className={styles.th}>Role</th>
-              <th className={styles.th}>Status</th>
-              <th className={styles.th}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user, idx) => (
-              <tr key={idx}>
-                <td className={styles.td}>{user.name}</td>
-                <td className={styles.td}>{user.email}</td>
-                <td className={styles.td}>{user.role}</td>
-                <td className={styles.td}>{user.status}</td>
-                <td className={styles.td}>
-                  <button onClick={() => resetPassword(user.email)} style={{ marginRight: "0.5rem" }}>
-                    🔄 Reset
-                  </button>
-                  <button onClick={() => deleteUser(user.email)} style={{ marginRight: "0.5rem" }}>
-                    ❌ Delete
-                  </button>
-                  <select
-                    defaultValue={user.role}
-                    onChange={(e) => changeUserRole(user.email, e.target.value)}
-                    style={{ marginRight: "0.5rem" }}
-                  >
-                    <option value="student">Student</option>
-                    <option value="teacher">Teacher</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                  <button onClick={() => toggleBlock(user.email)}>
-                    {user.status === "blocked" ? "Unblock" : "Block"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      )}
     </div>
   );
 }

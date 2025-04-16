@@ -40,4 +40,3 @@ const PORT = process.argv[2] || process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
-
