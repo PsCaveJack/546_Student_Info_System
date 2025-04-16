@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
      "test": "echo \"Error: no test specified\" && exit 1",
-    "setup": "if [ ! -f .env ]; then cp /home/ubuntu/homework/CPSC546/homework_1/backend/.env .env; fi",
+    "setup": "",
       "dev": "npm run setup && ts-node server.ts"
   },
   "keywords": [],
