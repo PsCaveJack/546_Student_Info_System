@@ -6,7 +6,6 @@ export const fetchCourses = async (
   setCourses: React.Dispatch<React.SetStateAction<Course[]>>
 ) => {
   try {
-    // ${API_BASE} was http://localhost:5000/api, changed to this because of the fallback design
     const res = await fetch(`${API_BASE}/courses`);
     if (!res.ok) throw new Error("Failed to fetch users");
 
@@ -16,3 +15,9 @@ export const fetchCourses = async (
     console.error("❌ fetchCourses error:", err);
   }
 };
+
+export const createCourse = async (
+
+) => {
+
+}
