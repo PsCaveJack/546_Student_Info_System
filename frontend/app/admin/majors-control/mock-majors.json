@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Computer Science",
+    "requirements": [
+      "Introduction to Programming",
+      "Data Structures",
+      "Algorithms",
+      "Operating Systems",
+      "Database Systems"
+    ]
+  },
+  {
+    "name": "Business Administration",
+    "requirements": [
+      "Principles of Management",
+      "Accounting Fundamentals",
+      "Marketing Essentials",
+      "Business Law",
+      "Financial Analysis"
+    ]
+  },
+  {
+    "name": "Mechanical Engineering",
+    "requirements": [
+      "Engineering Mechanics",
+      "Thermodynamics",
+      "Fluid Dynamics",
+      "Materials Science",
+      "Machine Design"
+    ]
+  }
+]
