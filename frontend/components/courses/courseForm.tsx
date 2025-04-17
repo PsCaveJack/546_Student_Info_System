@@ -44,16 +44,15 @@ const CourseForm = (({course, currentCourses, handleClose}: CourseFormParams) =>
     setDisabled(true);
     if(course){
       try {
-        axios.put(`${API_BASE}/courses`, formData)
+        await axios.put(`${API_BASE}/courses/${course.courseCode}`, formData)
       }
       catch (e) {
         console.log("Edit course error", e)
-
       }
     }
     else {
       try {
-        axios.post(`${API_BASE}/courses`, formData)
+        await axios.post(`${API_BASE}/courses`, formData)
       }
       catch (e) {
         console.log("Add course error", e)
@@ -83,6 +82,7 @@ const CourseForm = (({course, currentCourses, handleClose}: CourseFormParams) =>
         label="Course Number"
         helperText="Must be unique"
         required
+        disabled={course !== undefined}
         {...register("courseCode")}
       />
       <TextField
@@ -103,6 +103,7 @@ const CourseForm = (({course, currentCourses, handleClose}: CourseFormParams) =>
       <Controller
         name="prerequisites"
         control={control}
+        defaultValue={[]}
         render={({field}) => 
           <Autocomplete
             multiple
