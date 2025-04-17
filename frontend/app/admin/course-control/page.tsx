@@ -25,6 +25,10 @@ export default function CourseControlPage() {
     { field: 'units', headerName: 'Units', width: 150, sortable: false },
     { field: 'department', headerName: 'Department', width: 150, sortable: false },
   ];
+
+  function getRowId(row: any) {
+    return row._id;
+  }
   
   return (
     <Box
@@ -37,6 +41,7 @@ export default function CourseControlPage() {
       {
         courses.data && 
         <DataGrid 
+          getRowId={getRowId}
           rows={courses.data} 
           columns={columns} 
           sx={{
