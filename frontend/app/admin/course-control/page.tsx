@@ -16,8 +16,8 @@ export default function CourseControlPage() {
 
   const [drawer, setDrawer] = useState(false);
 
-  const addCourse = () => {
-    
+  const handleFormClose = () => {
+    setDrawer(false);
     courses.mutate();
   }
 
@@ -41,34 +41,39 @@ export default function CourseControlPage() {
       }}
     >
       {
-        courses.data && 
-        <DataGrid 
-          getRowId={getRowId}
-          rows={courses.data} 
-          columns={columns} 
-          sx={{
-            width: "auto",
-            backgroundColor:"white",
-          }}
-        />
-      }
-      <Button
-        sx = {{
-          backgroundColor:"white",
-          color: "black",
+        courses.data && (
+          <>
+            <DataGrid 
+              getRowId={getRowId}
+              rows={courses.data} 
+              columns={columns} 
+              sx={{
+                width: "auto",
+                backgroundColor:"white",
+              }}
+            />
+            <Button
+              sx = {{
+                backgroundColor:"white",
+                color: "black",
 
-        }}
-        onClick={() =>setDrawer(true)}
-      >
-        Add Courses
-      </Button>
-      <Drawer
-        anchor="right"
-        open={drawer}
-        onClose={() => setDrawer(false)}
-      >
-        <CourseForm currentCourses={courses.data}/>
-      </Drawer>
+              }}
+              onClick={() =>setDrawer(true)}
+            >
+              Add Courses
+            </Button>
+            <Drawer
+              anchor="right"
+              open={drawer}
+              onClose={() => setDrawer(false)}
+            >
+              <CourseForm currentCourses={courses.data} handleClose={handleFormClose}/>
+            </Drawer>
+          </>
+        )
+      }
+      
+      
     </Box>
   )
   
