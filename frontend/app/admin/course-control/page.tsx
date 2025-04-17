@@ -1,10 +1,11 @@
 "use client";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
 
+import CourseForm from "@/components/courses/courseForm";
 import { dataFetcher } from "@/fetchers/classFetchers";
 import { fetchCourses } from "@/handlers/classHandlers";
 import { Course } from "@/types/classTypes";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Drawer } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
@@ -13,9 +14,10 @@ export default function CourseControlPage() {
   
   const courses = useSWR(`${API_BASE}/courses`, dataFetcher);
 
-  
+  const [drawer, setDrawer] = useState(false);
 
   const addCourse = () => {
+    
     courses.mutate();
   }
 
@@ -56,11 +58,17 @@ export default function CourseControlPage() {
           color: "black",
 
         }}
-        onClick={addCourse}
+        onClick={() =>setDrawer(true)}
       >
         Add Courses
       </Button>
-      
+      <Drawer
+        anchor="right"
+        open={drawer}
+        onClose={() => setDrawer(false)}
+      >
+        <CourseForm currentCourses={courses.data}/>
+      </Drawer>
     </Box>
   )
   
