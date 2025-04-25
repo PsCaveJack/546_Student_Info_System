@@ -1,0 +1,25 @@
+
+> backend@1.0.0 dev
+> npm run setup && ts-node server.ts -p 8000
+
+🚀 Server running on http://localhost:-p
+✅ MongoDB connected
+
+> backend@1.0.0 dev
+> npm run setup && ts-node server.ts
+
+🚀 Server running on http://localhost:5012
+✅ MongoDB connected
+
+> backend@1.0.0 dev
+> npm run setup && ts-node server.ts
+
+🚀 Server running on http://localhost:3006
+✅ MongoDB connected
+
+> backend@1.0.0 dev
+> npm run setup && ts-node server.ts
+
+🚀 Server running on http://localhost:3006
+✅ MongoDB connected
+Terminated
