@@ -1,5 +1,12 @@
 "use client";
 
+// <Jack Rogers> 4-26-2025
+//   use this base when pulling from the API
+//   should pull from env file
+//    example: NEXT_PUBLIC_API_BASE=http://localhost:5002/api
+//  Everyone uses a different port number, so using a fixed string for the api destination won't work sometimes :D
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
+
 import React, { useEffect, useState } from "react";
 import styles from "./MajorsControl.module.css";
 
@@ -22,7 +29,7 @@ export default function MajorRequirementAdminPage() {
   useEffect(() => {
     const fetchMajors = async () => {
       try {
-        const response = await fetch("http://localhost:5005/api/majors");
+        const response = await fetch(`${API_BASE}/majors`);
         const data = await response.json();
 
         const transformedMajors = data.map((item: any) => ({
@@ -89,7 +96,7 @@ export default function MajorRequirementAdminPage() {
         electives: majorForm.electives,
       };
 
-      const response = await fetch("http://localhost:5005/api/majors", {
+      const response = await fetch(`${API_BASE}/majors`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newMajor),
@@ -215,7 +222,7 @@ export default function MajorRequirementAdminPage() {
                   <td className={styles.td}>{major.name}</td>
                   <td className={styles.td}>
                     <ul>
-                      {major.requirements.map((req, i) => (
+                      {major.requirements?.map((req, i) => (
                         <li key={i}>{req}</li>
                       ))}
                     </ul>

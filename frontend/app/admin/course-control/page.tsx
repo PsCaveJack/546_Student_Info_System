@@ -5,7 +5,7 @@ import CourseForm from "@/components/courses/courseForm";
 import { dataFetcher } from "@/fetchers/classFetchers";
 import { fetchCourses } from "@/handlers/classHandlers";
 import { Course } from "@/types/classTypes";
-import { Box, Button, Drawer } from "@mui/material";
+import { Box, Button, Drawer, TextField } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -18,6 +18,14 @@ export default function CourseControlPage() {
 
   const [drawer, setDrawer] = useState(false);
   const [courseToEdit, setCourseToEdit] = useState<Course | undefined>(undefined);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const filteredCourses = courses.data?.filter((course: Course) => {
+    const query = searchTerm.toLowerCase();
+    return (
+      course.courseCode.toString().includes(query) || course.courseName.toLowerCase().includes(query)
+    );
+  });
 
   const handleFormClose = () => {
     setDrawer(false);
@@ -41,8 +49,8 @@ export default function CourseControlPage() {
 
   const columns: GridColDef[] = [
     { field: 'courseCode', headerName: 'ID', width: 150, sortable: false },
-    { field: 'courseName', headerName: 'Name', width: 150, sortable: false },
-    { field: 'units', headerName: 'Units', width: 150, sortable: false },
+    { field: 'courseName', headerName: 'Name', width: 300, sortable: false },
+    { field: 'units', headerName: 'Units', width: 100, sortable: false },
     { field: 'department', headerName: 'Department', width: 150, sortable: false },
     {
       field: 'edit', 
@@ -110,29 +118,56 @@ export default function CourseControlPage() {
   return (
     <Box
       sx={{
-        alignContent:"center",
-        alignItems:"center",
-        width:"700px"
+        alignItems: "center",
+        display: "flex",
+        flexDirection: "column",
+        gap: 3, // Adjusted gap for proper vertical spacing
+        padding: "20px", // Added padding for proper spacing inside the Box
+        maxWidth: "100%",
+        margin: "0 auto", // Center the entire content horizontally
       }}
     >
       {
         courses.data && (
           <>
-            <DataGrid 
-              getRowId={getRowId}
-              rows={courses.data} 
-              columns={columns} 
+            <TextField
+              label="Search by ID or Name"
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               sx={{
-                width: "auto",
-                backgroundColor:"white",
+                marginBottom: 2,
+                width: "100%",
+                maxWidth: "400px",
+                backgroundColor: "white",
+                borderRadius: "12px",
+                boxShadow: 1,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "12px",
+                  "& fieldset": {
+                    borderColor: "#ccc",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#1e90ff",
+                  },
+                },
               }}
             />
-            <Button
-              sx = {{
-                backgroundColor:"white",
-                color: "black",
 
-              }}
+            <div style={{ width: "fit-content", maxWidth: "100%" }}>
+              <DataGrid 
+                getRowId={getRowId}
+                rows={filteredCourses || courses.data} 
+                columns={columns} 
+                sx={{
+                  backgroundColor:"white",
+                }}
+              />
+            </div>
+            
+            <Button
+              className="fancy-button"
               onClick={() =>setDrawer(true)}
             >
               Add Courses
