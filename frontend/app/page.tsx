@@ -1,11 +1,11 @@
-'use client';
+"use client"; // <-- ADD THIS AT THE VERY TOP
 
 import { useState } from 'react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('student'); // <-- added role selection
+  const [role, setRole] = useState('student');
   const [error, setError] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -13,10 +13,10 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await fetch('http://54.177.16.23:5012/api/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, role }),
+      const params = new URLSearchParams({ email, password, role });
+
+      const res = await fetch(`http://54.177.16.23:5006/api/users/login?${params}`, {
+        method: 'GET',
       });
 
       if (!res.ok) {
@@ -26,7 +26,7 @@ export default function LoginPage() {
 
       const data = await res.json();
       console.log('Login successful!', data);
-      // You can redirect or save user info here
+      // Redirect or save user info here
     } catch (err: any) {
       setError(err.message);
     }
@@ -41,7 +41,7 @@ export default function LoginPage() {
           placeholder="Email"
           className="w-full p-2 border rounded"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
@@ -49,12 +49,12 @@ export default function LoginPage() {
           placeholder="Password"
           className="w-full p-2 border rounded"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
         <select
           value={role}
-          onChange={e => setRole(e.target.value)}
+          onChange={(e) => setRole(e.target.value)}
           className="w-full p-2 border rounded"
         >
           <option value="student">Student</option>

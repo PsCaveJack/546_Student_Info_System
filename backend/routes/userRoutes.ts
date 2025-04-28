@@ -27,9 +27,14 @@ const createUser: RequestHandler = async (req, res) => {
 };
 router.post('/', createUser);
 
-// POST /api/users/login - User login
+// GET /api/users/login - User login
 const loginHandler: RequestHandler = async (req, res) => {
-  const { email, password, role } = req.body;
+  const { email, password, role } = req.query; // <-- use req.query instead of req.body
+
+  if (!email || !password || !role) {
+    res.status(400).json({ error: 'Email, password, and role are required' });
+    return;
+  }
 
   try {
     const user = await User.findOne({ email, password, role });
@@ -39,16 +44,15 @@ const loginHandler: RequestHandler = async (req, res) => {
       return;
     }
 
-    // strip out password before sending back
     const { password: _, ...userWithoutPassword } = user.toObject();
     res.json({ message: 'Login successful', user: userWithoutPassword });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
-router.post('/login', loginHandler);
 
-// DELETE /api/users/:id - Delete user by id
+// Update the router to use GET instead of POST
+router.get('/login', loginHandler);// DELETE /api/users/:id - Delete user by id
 const deleteUser: RequestHandler = async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.params.id);
