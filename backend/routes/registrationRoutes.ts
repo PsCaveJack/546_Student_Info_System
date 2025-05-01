@@ -26,5 +26,38 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
+// Get active registrations for a student
+router.get('/student/:id/enrolled', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const registrations = await Registration.find({ 
+      studentId: id, 
+      status: 'enrolled' 
+    }).populate('sectionId');
+    res.json(registrations);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Drop a registration
+router.put('/:id/drop', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updated = await Registration.findByIdAndUpdate(
+      id,
+      { status: 'dropped', dropDate: new Date() },
+      { new: true }
+    );
+    if (!updated) {
+      res.status(404).json({ error: "Registration not found" });
+      return;
+    }
+    res.json(updated);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 export default router;
 
