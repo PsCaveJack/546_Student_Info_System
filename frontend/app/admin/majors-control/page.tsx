@@ -22,7 +22,7 @@ export default function MajorRequirementAdminPage() {
   useEffect(() => {
     const fetchMajors = async () => {
       try {
-        const response = await fetch("http://localhost:5005/api/majors");
+        const response = await fetch("http://localhost:5050/api/majors");
         const data = await response.json();
 
         const transformedMajors = data.map((item: any) => ({
@@ -89,7 +89,7 @@ export default function MajorRequirementAdminPage() {
         electives: majorForm.electives,
       };
 
-      const response = await fetch("http://localhost:5005/api/majors", {
+      const response = await fetch("http://localhost:5050/api/majors", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newMajor),
