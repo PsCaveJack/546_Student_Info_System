@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
 
 const logRequest = (method: string, url: string) => {
   if (process.env.NODE_ENV === 'development') {
@@ -32,8 +32,8 @@ export const dataFetcher = async (url: string) => {
 // fetcher for student active classes
 export const fetchStudentActiveClasses = async (studentId: string) => {
   if (!API_BASE) {
-    console.error('❌ Configuration error: NEXT_PUBLIC_BACKEND_URL environment variable is not defined');
-    throw new Error('API configuration error: NEXT_PUBLIC_BACKEND_URL is not defined');
+    console.error('❌ Configuration error: NEXT_PUBLIC_API_BASE environment variable is not defined');
+    throw new Error('API configuration error: NEXT_PUBLIC_API_BASE is not defined');
   }
 
   const endpoint = `${API_BASE}/registrations/student/${studentId}/enrolled`;
