@@ -17,12 +17,14 @@ export interface IUser extends Document {
   firstName?: string;
   lastName?: string;
   email?: string;
+  major?: string;
   schedule?: IScheduleEntry[];
   history?: ICourseHistory[];
   unitsCompleted?: number;
   gradeLevel?: string;
   GPA?: number;
   coursesTaught?: IScheduleEntry[];
+  graduationStatus?: 'Not Eligible' | 'Eligible' | 'Approved';
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -35,20 +37,30 @@ const UserSchema: Schema<IUser> = new Schema(
     firstName: String,
     lastName: String,
     email: { type: String, unique: true },
+
+    major: { type: String },
+
     schedule: [{ sectionId: { type: Schema.Types.ObjectId, ref: 'Section' } }],
-    history: [{
-      courseCode: String,
-      grade: String,
-      credits: Number
-    }],
+    history: [
+      {
+        courseCode: String,
+        grade: String,
+        credits: Number
+      }
+    ],
     unitsCompleted: Number,
     gradeLevel: String,
     GPA: Number,
-    coursesTaught: [{ sectionId: { type: Schema.Types.ObjectId, ref: 'Section' } }]
+    coursesTaught: [{ sectionId: { type: Schema.Types.ObjectId, ref: 'Section' } }],
+
+    graduationStatus: {
+      type: String,
+      enum: ['Not Eligible', 'Eligible', 'Approved'],
+      default: 'Not Eligible'
+    }
   },
   { timestamps: true }
 );
 
 const User: Model<IUser> = mongoose.model<IUser>('User', UserSchema);
 export default User;
-

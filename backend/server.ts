@@ -2,6 +2,8 @@ import dotenv from 'dotenv';
 import express, { Application, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import graduationRoutes from "./routes/graduationRoutes";
+
 
 // Load environment variables
 dotenv.config();
@@ -11,6 +13,7 @@ const app: Application = express();
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use("/api/graduation-check", graduationRoutes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI || '', {})
