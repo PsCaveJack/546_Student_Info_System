@@ -49,9 +49,9 @@ export default function SectionControlPage() {
     }
   }
 
-  const deleteSection = async (courseCode: string) => {
+  const deleteSection = async (courseCode: string, sectionNumber: string) => {
     if (courseCode) {
-      await axios.delete(`${API_BASE}/sections/${courseCode}`);
+      await axios.delete(`${API_BASE}/sections/${courseCode}/${sectionNumber}`);
       sections.mutate();
     }
   }
@@ -108,7 +108,7 @@ export default function SectionControlPage() {
             }}
           >
             <Button
-              onClick={() => deleteSection(params.row.courseCode)}
+              onClick={() => deleteSection(params.row.courseCode, params.row.section)}
             >
               <Delete/>
             </Button>
@@ -138,7 +138,6 @@ export default function SectionControlPage() {
       {
         sections.data && (
           <>
-            
             <SectionSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} 
               season={season} setSeason={setSeason} year={year} setYear={setYear} />
 
@@ -170,8 +169,6 @@ export default function SectionControlPage() {
           </>
         )
       }
-      
-      
     </Box>
   )
 }

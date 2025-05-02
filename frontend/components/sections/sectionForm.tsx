@@ -56,7 +56,7 @@ const SectionForm = (({section, handleClose}: SectionFormParams) => {
     setDisabled(true);
     if(section){
       try {
-        // await axios.put(`${API_BASE}/sections/${section.courseCode}`, formData)
+        await axios.put(`${API_BASE}/sections/${section.courseCode}/${section.section}`, formData)
       }
       catch (e) {
         console.log("Edit section error", e)
@@ -103,6 +103,7 @@ const SectionForm = (({section, handleClose}: SectionFormParams) => {
         label="Section"
         required
         type="number"
+        disabled={section != undefined}
         {...register('section')}
       />
 

@@ -21,4 +21,4 @@ export interface Section {
 
 export const Seasons: string[] = ["Spring", "Summer", "Fall"]
 
-export const allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+export const allDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
