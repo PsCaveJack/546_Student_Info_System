@@ -1,4 +1,4 @@
-interface Schedule {
+export interface Schedule {
   days: string[];
   time: string;
 }
@@ -20,3 +20,5 @@ export interface Section {
 }
 
 export const Seasons: string[] = ["Spring", "Summer", "Fall"]
+
+export const allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];

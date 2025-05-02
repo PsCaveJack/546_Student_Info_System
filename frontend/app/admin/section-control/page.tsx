@@ -122,9 +122,6 @@ export default function SectionControlPage() {
   function getRowId(row: any) {
     return row._id;
   }
-  useEffect(() => {
-    console.log("Sections",sections.data)
-  }, [sections])
 
   return (
     <Box
