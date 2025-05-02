@@ -1,121 +1,190 @@
 "use client";
-import { useEffect, useState } from "react";
-import useSWR from "swr";
-import axios from "axios";
-import { Box, Button, Drawer, CircularProgress, Typography } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Edit, Delete } from "@mui/icons-material";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
 
 import CourseForm from "@/components/courses/courseForm";
 import { dataFetcher } from "@/fetchers/classFetchers";
+import { fetchCourses } from "@/handlers/classHandlers";
 import { Course } from "@/types/classTypes";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5050/api";
+import { Box, Button, Drawer, TextField } from "@mui/material";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import useSWR, { mutate } from "swr";
+import { Edit, Delete } from "@mui/icons-material";
 
 export default function CourseControlPage() {
   
-  const { data, error, mutate } = useSWR(`${API_BASE}/courses`, dataFetcher);
- 
+  const courses = useSWR(`${API_BASE}/courses`, dataFetcher);
+
   const [drawer, setDrawer] = useState(false);
   const [courseToEdit, setCourseToEdit] = useState<Course | undefined>(undefined);
-  const [isClient, setIsClient] = useState(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
-  useEffect(() => {
-    setIsClient(true); // to prevent SSR mismatch
-  }, []);
+  const filteredCourses = courses.data?.filter((course: Course) => {
+    const query = searchTerm.toLowerCase();
+    return (
+      course.courseCode.toString().includes(query) || course.courseName.toLowerCase().includes(query)
+    );
+  });
 
   const handleFormClose = () => {
     setDrawer(false);
     setCourseToEdit(undefined);
-    mutate();
-  };
+    courses.mutate();
+  }
 
   const editCourse = (course: Course) => {
-    setCourseToEdit(course);
-    setDrawer(true);
-  };
+    if (course) {
+      setCourseToEdit(course);
+      setDrawer(true);
+    }
+  }
 
   const deleteCourse = async (courseCode: string) => {
     if (courseCode) {
-      try {
-        await axios.delete(`${API_BASE}/courses/${courseCode}`);
-        mutate();
-      } catch (err) {
-        console.error("Delete failed", err);
-      }
+      await axios.delete(`${API_BASE}/courses/${courseCode}`);
+      courses.mutate();
     }
-  };
+  }
 
   const columns: GridColDef[] = [
     { field: 'courseCode', headerName: 'ID', width: 150, sortable: false },
-    { field: 'courseName', headerName: 'Name', width: 150, sortable: false },
-    { field: 'units', headerName: 'Units', width: 150, sortable: false },
+    { field: 'courseName', headerName: 'Name', width: 300, sortable: false },
+    { field: 'units', headerName: 'Units', width: 100, sortable: false },
     { field: 'department', headerName: 'Department', width: 150, sortable: false },
     {
-      field: 'edit',
+      field: 'edit', 
       headerName: 'Edit',
       width: 100,
       sortable: false,
       disableColumnMenu: true,
       headerAlign: "center",
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
-          <Button onClick={() => editCourse(params.row)}>
-            <Edit />
-          </Button>
-        </Box>
-      ),
+      renderCell: (params) => {
+        const {id} = params;
+        return (
+          <Box
+            sx = {{
+              display: "flex",
+              justifyContent: "center",
+              alignItems:"center",
+              width:"100%",
+              height:"100%",
+            }}
+          >
+            <Button
+              onClick={() => editCourse(params.row)}
+            >
+              <Edit/>
+            </Button>
+          </Box>
+        );
+      }
     },
     {
-      field: 'delete',
+      field: 'delete', 
       headerName: 'Delete',
       width: 100,
       sortable: false,
       disableColumnMenu: true,
       headerAlign: "center",
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
-          <Button onClick={() => deleteCourse(params.row.courseCode)}>
-            <Delete />
-          </Button>
-        </Box>
-      ),
-    },
+      renderCell: (params) => {
+        const {id} = params;
+        return (
+          <Box
+            sx = {{
+              display: "flex",
+              justifyContent: "center",
+              alignItems:"center",
+              width:"100%",
+              height:"100%",
+            }}
+          >
+            <Button
+              onClick={() => deleteCourse(params.row.courseCode)}
+            >
+              <Delete/>
+            </Button>
+          </Box>
+        );
+        
+      }
+    }
   ];
 
-  const getRowId = (row: any) => row._id;
-
-  if (!isClient) return null; // avoid hydration error
-
-  if (error) {
-    return <Typography color="error">Failed to load courses.</Typography>;
+  function getRowId(row: any) {
+    return row._id;
   }
-
-  if (!data) {
-    return <CircularProgress />;
-  }
-
+  
   return (
-    <Box sx={{ alignContent: "center", alignItems: "center", width: "700px" }}>
-      <DataGrid
-        getRowId={getRowId}
-        rows={data}
-        columns={columns}
-        sx={{ width: "auto", backgroundColor: "white" }}
-      />
-      <Button
-        sx={{ backgroundColor: "white", color: "black", mt: 2 }}
-        onClick={() => setDrawer(true)}
-      >
-        Add Courses
-      </Button>
-      <Drawer
-        anchor="right"
-        open={drawer}
-        onClose={handleFormClose}
-      >
-        <CourseForm course={courseToEdit} currentCourses={data} handleClose={handleFormClose} />
-      </Drawer>
+    <Box
+      sx={{
+        alignItems: "center",
+        display: "flex",
+        flexDirection: "column",
+        gap: 3, // Adjusted gap for proper vertical spacing
+        padding: "20px", // Added padding for proper spacing inside the Box
+        maxWidth: "100%",
+        margin: "0 auto", // Center the entire content horizontally
+      }}
+    >
+      {
+        courses.data && (
+          <>
+            <TextField
+              label="Search by ID or Name"
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              sx={{
+                marginBottom: 2,
+                width: "100%",
+                maxWidth: "400px",
+                backgroundColor: "white",
+                borderRadius: "12px",
+                boxShadow: 1,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "12px",
+                  "& fieldset": {
+                    borderColor: "#ccc",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#1e90ff",
+                  },
+                },
+              }}
+            />
+
+            <div style={{ width: "fit-content", maxWidth: "100%" }}>
+              <DataGrid 
+                getRowId={getRowId}
+                rows={filteredCourses || courses.data} 
+                columns={columns} 
+                sx={{
+                  backgroundColor:"white",
+                }}
+              />
+            </div>
+            
+            <Button
+              className="fancy-button"
+              onClick={() =>setDrawer(true)}
+            >
+              Add Courses
+            </Button>
+            <Drawer
+              anchor="right"
+              open={drawer}
+              onClose={() => handleFormClose()}
+            >
+              <CourseForm course={courseToEdit} currentCourses={courses.data} handleClose={handleFormClose}/>
+            </Drawer>
+          </>
+        )
+      }
+      
+      
     </Box>
-  );
+  )
+  
 }
