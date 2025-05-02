@@ -1,13 +1,14 @@
 "use client";
 
 import SectionForm from "@/components/sections/sectionForm"
+import SectionSearchBar from "@/components/sections/sectionSearchBar";
 import { dataFetcher } from "@/fetchers/classFetchers";
-import { Section } from "@/types/classTypes";
+import { Section } from "@/types/sectionTypes";
 import { Edit, Delete } from "@mui/icons-material";
 import { Box, Button, Drawer, TextField } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import axios from "axios";
-import { useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import useSWR from "swr";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
@@ -20,10 +21,18 @@ export default function SectionControlPage() {
   const [sectionToEdit, setSectionToEdit] = useState<Section | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
+  const [season, setSeason] = useState<string>("");
+  const [year, setYear] = useState<string>("2025");
+
   const filteredSections = sections.data?.filter((section: Section) => {
     const query = searchTerm.toLowerCase();
+
+    const matchingSeason = (season !== "") ? section.semester.includes(season) : true;
+    const matchingYear = (year !== "") ? section.semester.includes(year) : true;
+
+    console.log("year included in " + section.courseCode + " is " +matchingYear)
     return (
-      section.courseCode.toString().includes(query)
+      section.courseCode.toString().includes(query) && matchingSeason && matchingYear
     );
   });
 
@@ -113,6 +122,9 @@ export default function SectionControlPage() {
   function getRowId(row: any) {
     return row._id;
   }
+  useEffect(() => {
+    console.log("Sections",sections.data)
+  }, [sections])
 
   return (
     <Box
@@ -130,30 +142,8 @@ export default function SectionControlPage() {
         sections.data && (
           <>
             
-            <TextField
-              label="Search by ID"
-              variant="outlined"
-              size="small"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              sx={{
-                marginBottom: 2,
-                width: "100%",
-                maxWidth: "400px",
-                backgroundColor: "white",
-                borderRadius: "12px",
-                boxShadow: 1,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "12px",
-                  "& fieldset": {
-                    borderColor: "#ccc",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#1e90ff",
-                  },
-                },
-              }}
-            />
+            <SectionSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} 
+              season={season} setSeason={setSeason} year={year} setYear={setYear} />
 
             <div style={{ width: "fit-content", maxWidth: "100%" }}>
               <DataGrid 

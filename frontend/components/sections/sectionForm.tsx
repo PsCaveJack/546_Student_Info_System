@@ -1,4 +1,4 @@
-import { Section } from "@/types/classTypes";
+import { Section } from "@/types/sectionTypes";
 
 interface SectionFormParams {
   section?: Section

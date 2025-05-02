@@ -1,4 +1,5 @@
-import { Box, TextField } from "@mui/material";
+import { Seasons } from "@/types/sectionTypes";
+import { Autocomplete, Box, MenuItem, Select, TextField } from "@mui/material";
 import { SetStateAction } from "react";
 
 interface SearchBarParams {
@@ -22,12 +23,45 @@ const SectionSearchBar = (({searchTerm, setSearchTerm, season, setSeason, year, 
         margin: "0 auto", // Center the entire content horizontally
       }}
     >
+      <Select
+        value={season}
+        onChange={(e) => {setSeason(e.target.value)}}
+        sx={{
+          width:"200px",
+          lineHeight:"inherit",
+        }}
+        label="Season"
+      >
+        {
+          Seasons.map((season) => (
+            <MenuItem value={season}>
+              {season}
+            </MenuItem>
+          ))
+        }
+        
+      </Select>
       <TextField
         label="Year"
         variant="outlined"
         size="small"
         value={year}
         onChange={(e) => setYear(e.target.value)}
+        type="number"
+        sx={{
+          backgroundColor: "white",
+          borderRadius: "12px",
+          boxShadow: 1,
+          "& .MuiOutlinedInput-root": {
+            borderRadius: "12px",
+            "& fieldset": {
+              borderColor: "#ccc",
+            },
+            "&:hover fieldset": {
+              borderColor: "#1e90ff",
+            },
+          },
+        }}
       />
       <TextField
         label="Search by ID"
@@ -36,7 +70,6 @@ const SectionSearchBar = (({searchTerm, setSearchTerm, season, setSeason, year, 
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         sx={{
-          marginBottom: 2,
           width: "100%",
           maxWidth: "400px",
           backgroundColor: "white",
