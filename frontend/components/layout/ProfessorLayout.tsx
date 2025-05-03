@@ -14,7 +14,7 @@ const ProfessorLayout: React.FC<ProfessorLayoutProps> = ({ children }) => {
         </div>
         <ul className="professor-nav-links">
           <li>
-            <a href="/professor">Dashboard</a>
+            <a href="/professor">Home</a>
           </li>
           <li>
             <a href="/professor/courses">My Courses</a>
