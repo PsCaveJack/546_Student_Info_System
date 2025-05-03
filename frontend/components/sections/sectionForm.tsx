@@ -1,8 +1,11 @@
+import { dataFetcher } from "@/fetchers/classFetchers";
+import { Course } from "@/types/classTypes";
 import { Section, Schedule, allDays } from "@/types/sectionTypes";
-import { Box, Button, Checkbox, FormControl, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Checkbox, FormControl, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import useSWR from "swr";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
 
@@ -29,6 +32,8 @@ interface CourseForm {
 
 const SectionForm = (({section, handleClose}: SectionFormParams) => {
 
+  const courses = useSWR(`${API_BASE}/courses`, dataFetcher);
+
   const { register, handleSubmit, watch, formState: { errors }, control } = useForm<CourseForm>({
     defaultValues: {
       courseCode: section?.courseCode ?? "",
@@ -50,13 +55,15 @@ const SectionForm = (({section, handleClose}: SectionFormParams) => {
     },
   });
 
+  const courseCodes: string[] = courses.data?.map((course: Course) => (course.courseCode)) || [];
+
   const [submitDisabled, setDisabled] = useState(false);
 
   const onSubmit = handleSubmit(async (formData) => {
     setDisabled(true);
     if(section){
       try {
-        await axios.put(`${API_BASE}/sections/${section.courseCode}/${section.section}`, formData)
+        await axios.put(`${API_BASE}/sections/${section._id}`, formData)
       }
       catch (e) {
         console.log("Edit section error", e)
@@ -89,13 +96,18 @@ const SectionForm = (({section, handleClose}: SectionFormParams) => {
       <Typography variant="h6">
         {(section) ? "Edit Section" : "Add Section"}
       </Typography>
-      <TextField
-        fullWidth
-        label="Course Code"
-        helperText="Must be unique"
-        required
-        disabled={section != undefined}
-        {...register('courseCode')}
+
+      <Autocomplete
+        disablePortal
+        options={courseCodes}
+        renderInput={(params) => 
+          <TextField 
+            {...params} 
+            fullWidth
+            label="Course Code"
+            required
+            {...register('courseCode')}
+          />}
       />
 
       <TextField
@@ -103,7 +115,6 @@ const SectionForm = (({section, handleClose}: SectionFormParams) => {
         label="Section"
         required
         type="number"
-        disabled={section != undefined}
         {...register('section')}
       />
 

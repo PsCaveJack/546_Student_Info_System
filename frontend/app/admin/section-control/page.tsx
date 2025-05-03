@@ -49,9 +49,9 @@ export default function SectionControlPage() {
     }
   }
 
-  const deleteSection = async (courseCode: string, sectionNumber: string) => {
-    if (courseCode) {
-      await axios.delete(`${API_BASE}/sections/${courseCode}/${sectionNumber}`);
+  const deleteSection = async (id: string) => {
+    if (id) {
+      await axios.delete(`${API_BASE}/sections/${id}`);
       sections.mutate();
     }
   }
@@ -108,7 +108,7 @@ export default function SectionControlPage() {
             }}
           >
             <Button
-              onClick={() => deleteSection(params.row.courseCode, params.row.section)}
+              onClick={() => deleteSection(params.row._id)}
             >
               <Delete/>
             </Button>

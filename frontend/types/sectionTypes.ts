@@ -4,6 +4,7 @@ export interface Schedule {
 }
 
 export interface Section {
+  _id: string;
   courseCode: string;
   section: string;
   semester: string;
