@@ -33,6 +33,7 @@ interface CourseForm {
 const SectionForm = (({section, handleClose}: SectionFormParams) => {
 
   const courses = useSWR(`${API_BASE}/courses`, dataFetcher);
+  const professors = useSWR(`${API_BASE}/professor`, dataFetcher);
 
   const { register, handleSubmit, watch, formState: { errors }, control } = useForm<CourseForm>({
     defaultValues: {
@@ -56,6 +57,8 @@ const SectionForm = (({section, handleClose}: SectionFormParams) => {
   });
 
   const courseCodes: string[] = courses.data?.map((course: Course) => (course.courseCode)) || [];
+
+  const professorUsernames: string[] = professors.data?.map((professor: any) => (professor.username)) || [];
 
   const [submitDisabled, setDisabled] = useState(false);
 
@@ -125,11 +128,17 @@ const SectionForm = (({section, handleClose}: SectionFormParams) => {
         {...register('semester')}
       />
 
-      <TextField
-        fullWidth
-        label="Instructor"
-        required
-        {...register('instructor')}
+      <Autocomplete
+        disablePortal
+        options={professorUsernames}
+        renderInput={(params) => 
+          <TextField 
+            {...params} 
+            fullWidth
+            label="Instructor"
+            required
+            {...register('instructor')}
+          />}
       />
 
       <TextField
