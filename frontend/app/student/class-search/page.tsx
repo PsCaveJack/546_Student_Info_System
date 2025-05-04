@@ -23,6 +23,8 @@ export default function ClassSearchPage() {
   const [season, setSeason] = useState<string>("");
   const [year, setYear] = useState<string>("2025");
 
+  const [error, setError] = useState<string | null>(null);
+
   const filteredSections = sections.data?.filter((section: Section) => {
     const query = searchTerm.toLowerCase();
 
@@ -36,6 +38,7 @@ export default function ClassSearchPage() {
   });
 
   const handleDetailsClose = () => {
+    setError(null);
     setDetailsOpen(false);
     setSectionToEdit(undefined);
     sections.mutate();
@@ -122,7 +125,8 @@ export default function ClassSearchPage() {
               open={detailsOpen}
               onClose={() => handleDetailsClose()}
             >
-              <ClassEnrollInfo section={sectionToEdit} userId={studentId} handleClose={handleDetailsClose}/>
+              <ClassEnrollInfo section={sectionToEdit} userId={studentId} handleClose={handleDetailsClose} 
+                error={error} setError={setError}/>
             </Drawer>
           </>
         )
