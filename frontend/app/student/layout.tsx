@@ -25,6 +25,8 @@ const StudentLayout = ({ children }: StudentLayoutProps) => {
     switch (pathname) {
       case '/student/class-control':
         return 'Active Classes';
+      case '/student/class-search':
+        return 'Search and Enroll Classes';
       default:
         return 'Student Dashboard';
     }
@@ -72,6 +74,11 @@ const StudentLayout = ({ children }: StudentLayoutProps) => {
             <ListItem component="button">
               <Link href="/student/class-control" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <ListItemText primary="Active Classes" />
+              </Link>
+            </ListItem>
+            <ListItem component="button">
+              <Link href="/student/class-search" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <ListItemText primary="Search and Enroll" />
               </Link>
             </ListItem>
           </List>

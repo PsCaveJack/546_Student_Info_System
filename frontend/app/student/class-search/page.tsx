@@ -2,13 +2,15 @@
 import SectionSearchBar from "@/components/sections/sectionSearchBar";
 import { dataFetcher } from "@/fetchers/classFetchers";
 import { Section } from "@/types/sectionTypes";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Drawer } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useState } from "react";
 import useSWR from "swr";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ClassEnrollInfo from "@/components/classes/ClassEnrollInfo";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
+const studentId = "67f38885cfae5e70ec671986";
 
 export default function ClassSearchPage() {
   const sections = useSWR(`${API_BASE}/sections`, dataFetcher);
@@ -33,12 +35,22 @@ export default function ClassSearchPage() {
     );
   });
 
+  const handleDetailsClose = () => {
+    setDetailsOpen(false);
+    setSectionToEdit(undefined);
+    sections.mutate();
+  }
+
   function getRowId(row: any) {
     return row._id;
   }
 
   function viewDetails(row: any) {
-    
+    if (row != undefined) {
+      setSectionToEdit(row);
+      setDetailsOpen(true);
+    }
+      
   }
 
   const columns: GridColDef[] = [
@@ -105,13 +117,13 @@ export default function ClassSearchPage() {
             </div>
             
             
-            {/* <Drawer
+            <Drawer
               anchor="right"
               open={detailsOpen}
-              onClose={() => handleFormClose()}
+              onClose={() => handleDetailsClose()}
             >
-              <SectionForm section={sectionToEdit} handleClose={handleFormClose}/>
-            </Drawer> */}
+              <ClassEnrollInfo section={sectionToEdit} userId={studentId} handleClose={handleDetailsClose}/>
+            </Drawer>
           </>
         )
       }
