@@ -1,4 +1,3 @@
-// src/app/professors/coursesview/enter-grades/StudentGradeRow.tsx
 'use client';
 
 import React from 'react';
@@ -18,7 +17,7 @@ interface Props {
   onChange: (id: string, grade: string) => void;
 }
 
-export default function StudentGradeRow({
+export default function StudentGrade({
   student,
   originalGrade,
   gradeOptions,
@@ -27,6 +26,8 @@ export default function StudentGradeRow({
   const current = student.grade || '';
   const changed = originalGrade !== current;
 
+
+  //UI
   return (
     <li key={student._id} className={styles.studentItem}>
       <span className={styles.studentName}>
