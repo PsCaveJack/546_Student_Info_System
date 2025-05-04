@@ -1,28 +1,29 @@
 "use client";
-
-import SectionForm from "@/components/sections/sectionForm"
 import SectionSearchBar from "@/components/sections/sectionSearchBar";
 import { dataFetcher } from "@/fetchers/classFetchers";
 import { Section } from "@/types/sectionTypes";
-import { Edit, Delete } from "@mui/icons-material";
-import { Box, Button, Drawer, TextField } from "@mui/material";
+import { Box, Button, Drawer } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import axios from "axios";
-import { SetStateAction, useEffect, useState } from "react";
+import { useState } from "react";
 import useSWR from "swr";
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ClassEnrollInfo from "@/components/classes/ClassEnrollInfo";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
+const studentId = "67f38885cfae5e70ec671986";
 
-export default function SectionControlPage() {
-
+export default function ClassSearchPage() {
   const sections = useSWR(`${API_BASE}/sections`, dataFetcher);
 
-  const [drawer, setDrawer] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [sectionToEdit, setSectionToEdit] = useState<Section | undefined>(undefined);
+
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const [season, setSeason] = useState<string>("");
   const [year, setYear] = useState<string>("2025");
+
+  const [error, setError] = useState<string | null>(null);
 
   const filteredSections = sections.data?.filter((section: Section) => {
     const query = searchTerm.toLowerCase();
@@ -36,24 +37,23 @@ export default function SectionControlPage() {
     );
   });
 
-  const handleFormClose = () => {
-    setDrawer(false);
+  const handleDetailsClose = () => {
+    setError(null);
+    setDetailsOpen(false);
     setSectionToEdit(undefined);
     sections.mutate();
   }
 
-  const editSection = (section: Section) => {
-    if (section) {
-      setSectionToEdit(section);
-      setDrawer(true);
-    }
+  function getRowId(row: any) {
+    return row._id;
   }
 
-  const deleteSection = async (id: string) => {
-    if (id) {
-      await axios.delete(`${API_BASE}/sections/${id}`);
-      sections.mutate();
+  function viewDetails(row: any) {
+    if (row != undefined) {
+      setSectionToEdit(row);
+      setDetailsOpen(true);
     }
+      
   }
 
   const columns: GridColDef[] = [
@@ -61,8 +61,8 @@ export default function SectionControlPage() {
     { field: 'section', headerName: 'Section', width: 100, sortable: false },
     { field: 'semester', headerName: 'Semester', width: 150, sortable: false },
     {
-      field: 'edit', 
-      headerName: 'Edit',
+      field: 'details', 
+      headerName: 'Details',
       width: 100,
       sortable: false,
       disableColumnMenu: true,
@@ -80,48 +80,15 @@ export default function SectionControlPage() {
             }}
           >
             <Button
-              onClick={() => editSection(params.row)}
+              onClick={() => viewDetails(params.row)}
             >
-              <Edit/>
+              <ArrowForwardIcon/>
             </Button>
           </Box>
         );
       }
     },
-    {
-      field: 'delete', 
-      headerName: 'Delete',
-      width: 100,
-      sortable: false,
-      disableColumnMenu: true,
-      headerAlign: "center",
-      renderCell: (params) => {
-        const {id} = params;
-        return (
-          <Box
-            sx = {{
-              display: "flex",
-              justifyContent: "center",
-              alignItems:"center",
-              width:"100%",
-              height:"100%",
-            }}
-          >
-            <Button
-              onClick={() => deleteSection(params.row._id)}
-            >
-              <Delete/>
-            </Button>
-          </Box>
-        );
-        
-      }
-    }
   ];
-
-  function getRowId(row: any) {
-    return row._id;
-  }
 
   return (
     <Box
@@ -155,20 +122,15 @@ export default function SectionControlPage() {
             
             <Drawer
               anchor="right"
-              open={drawer}
-              onClose={() => handleFormClose()}
+              open={detailsOpen}
+              onClose={() => handleDetailsClose()}
             >
-              <SectionForm section={sectionToEdit} handleClose={handleFormClose}/>
+              <ClassEnrollInfo section={sectionToEdit} userId={studentId} handleClose={handleDetailsClose} 
+                error={error} setError={setError}/>
             </Drawer>
-            <Button
-              className="fancy-button"
-              onClick={() =>setDrawer(true)}
-            >
-              Add Sections
-            </Button>
           </>
         )
       }
     </Box>
-  )
+  );
 }

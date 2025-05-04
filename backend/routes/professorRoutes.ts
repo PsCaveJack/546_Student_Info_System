@@ -6,6 +6,19 @@ import Course from '../models/Course';
 
 const router = express.Router();
 
+//  request to get all professors in the system, only returns name information
+router.get(
+  '/',
+  (async (req: Request, res: Response) => {
+    try {
+      const professors = await User.find({role: 'professor'}).select("username firstName lastName");
+      res.json(professors);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch professors' });
+    }
+  }) as RequestHandler
+)
+
 router.get(
   '/:professorId/students',
   (async (req: Request, res: Response) => {
