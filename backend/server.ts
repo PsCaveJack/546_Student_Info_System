@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import express, { Application, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import graduationRoutes from "./routes/graduationRoutes";
+
 
 
 // Load environment variables
@@ -13,7 +13,6 @@ const app: Application = express();
 // Middleware
 app.use(express.json());
 app.use(cors());
-app.use("/api/graduation-check", graduationRoutes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI || '', {})
@@ -31,12 +30,17 @@ import courseRoutes from './routes/courseRoutes';
 import sectionRoutes from './routes/sectionRoutes';
 import registrationRoutes from './routes/registrationRoutes';
 import majorRoutes from './routes/majorRoutes';
+import graduationRoutes from "./routes/graduationRoutes";
+import entergradesRoute from "./routes/entergradesRoute";
 
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/sections', sectionRoutes);
 app.use('/api/registrations', registrationRoutes);
 app.use('/api/majors', majorRoutes);
+app.use("/api/graduation-check", graduationRoutes);
+app.use('/api/course-grades', entergradesRoute);
+
 
 // Start the server
 const PORT = process.argv[2] || process.env.PORT || 5000;

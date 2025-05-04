@@ -1,4 +1,5 @@
 "use client";
+import Link from 'next/link';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
 
@@ -51,7 +52,13 @@ export default function ViewCoursesPage() {
             <p><strong>Description:</strong> {course.description}</p>
             <div className="button-group">
               <button className="course-button">View Students</button>
-              <button className="course-button">View Grades</button>
+
+              <Link
+                 href={`/professor/coursesview/enter-grades?courseId=${course._id}`}
+                className="course-button"
+                >View Grades
+              </Link>
+
             </div>
           </li>
         ))}

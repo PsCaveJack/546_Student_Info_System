@@ -7,4 +7,6 @@ export interface Course {
   department: string;
   createdAt?: Date;
   updatedAt?: Date;
+
+  _id: string;
 }
