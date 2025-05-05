@@ -8,17 +8,17 @@ const router = express.Router();
 
 // GET /api/course-grades/:id/students
 // Use course ID to to find student who has matching course ID
-const getStudentsByCourseId: RequestHandler<{ id: string }> = async (req, res) => {
+const getStudentsBysectionId: RequestHandler<{ id: string }> = async (req, res) => {
   try {
-    const courseId = req.params.id;
+    const sectionId = req.params.id;
 
     const students = await User.find(
-      { role: 'student', 'history.courseId': courseId },
+      { role: 'student', 'history.sectionId': sectionId },
       '_id firstName lastName history'
     );
 
     const formatted = students.map(s => {
-      const entry = s.history?.find(h => String(h.courseId) === courseId);
+      const entry = s.history?.find(h => String(h.sectionId) === sectionId);
       return {
         _id:       s._id,
         firstName: s.firstName,
@@ -33,7 +33,7 @@ const getStudentsByCourseId: RequestHandler<{ id: string }> = async (req, res) =
     res.status(500).json({ error: 'Internal server error' });
   }
 };
-router.get('/:id/students', getStudentsByCourseId);
+router.get('/:id/students', getStudentsBysectionId);
 
 
 
@@ -62,13 +62,13 @@ router.get('/:id/info', getCourseInfo);
 // Update grades
 const updateStudentGrades: RequestHandler<{ id: string }> = async (req, res) => {
   try {
-    const courseId = req.params.id;
+    const sectionId = req.params.id;
     const updates = req.body.students;
 
     await Promise.all(
       updates.map((s: { _id: string; grade: string }) =>
         User.updateOne(
-          { _id: s._id, 'history.courseId': courseId },
+          { _id: s._id, 'history.sectionId': sectionId },
           { $set: { 'history.$.grade': s.grade } }
         )
       )

@@ -54,7 +54,7 @@ export default function ViewCoursesPage() {
               <button className="course-button">View Students</button>
 
               <Link
-                 href={`/professor/coursesview/enter-grades?courseId=${course._id}`}
+                 href={`/professor/coursesview/enter-grades?sectionId=${course._id}`}
                 className="course-button"
                 >View Grades
               </Link>

@@ -12,7 +12,7 @@ type CourseInfo = {
 };
 
 export default function EnterGradesPage() {
-  const courseId = useSearchParams().get('courseId');
+  const sectionId = useSearchParams().get('sectionId');
   const [students, setStudents] = useState<Student[]>([]);
   const [originalGrades, setOriginalGrades] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -26,17 +26,17 @@ export default function EnterGradesPage() {
 
 
   useEffect(() => {
-    if (!courseId) return;
+    if (!sectionId) return;
 
-    // get courseID from URL
+    // get sectionId from URL
     axios
-      .get<CourseInfo>(`${API_BASE}/course-grades/${courseId}/info`)
+      .get<CourseInfo>(`${API_BASE}/course-grades/${sectionId}/info`)
       .then(res => setCourseInfo(res.data))
       .catch(() => setCourseInfo({ courseCode: '', courseName: '' }));
 
     // Use URL to find students
     axios
-      .get<Student[]>(`${API_BASE}/course-grades/${courseId}/students`)
+      .get<Student[]>(`${API_BASE}/course-grades/${sectionId}/students`)
       .then(res => {
         setStudents(res.data);
         const init: Record<string, string> = {};
@@ -45,7 +45,7 @@ export default function EnterGradesPage() {
       })
       .catch(() => alert('Could not load student list.'))
       .finally(() => setLoading(false));
-  }, [API_BASE, courseId]);
+  }, [API_BASE, sectionId]);
 
 
 
@@ -57,7 +57,7 @@ export default function EnterGradesPage() {
   const handleSubmit = async () => {
     const payload = { students: students.map(s => ({ _id: s._id, grade: s.grade || '' })) };
     try {
-      await axios.put(`${API_BASE}/course-grades/${courseId}/grades`, payload);
+      await axios.put(`${API_BASE}/course-grades/${sectionId}/grades`, payload);
       alert('Grades submitted!');
     } catch {
       alert('Failed to change grades.');
