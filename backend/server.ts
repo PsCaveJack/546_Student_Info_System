@@ -35,8 +35,6 @@ import courseRoutes from './routes/courseRoutes';
 import sectionRoutes from './routes/sectionRoutes';
 import registrationRoutes from './routes/registrationRoutes';
 import majorRoutes from './routes/majorRoutes';
-import graduationRoutes from "./routes/graduationRoutes";
-import entergradesRoute from "./routes/entergradesRoute";
 
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
