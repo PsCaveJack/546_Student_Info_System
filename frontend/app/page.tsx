@@ -13,7 +13,7 @@ export default function LoginPage() {
 		setError('');
 
 		try {
-			const res = await fetch(`${next_api}/login`, {
+			const res = await fetch(`${next_api}/users/login`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
