@@ -28,8 +28,8 @@ const createUser: RequestHandler = async (req, res) => {
 router.post('/', createUser);
 
 // GET /api/users/login - User login
-const loginHandler: RequestHandler = async (req, res) => {
-  const { email, password, role } = req.query; // <-- use req.query instead of req.body
+const loginHandler: RequestHandler = async (req, res): Promise<void> => {
+  const { email, password, role } = req.body;
 
   if (!email || !password || !role) {
     res.status(400).json({ error: 'Email, password, and role are required' });
@@ -45,13 +45,16 @@ const loginHandler: RequestHandler = async (req, res) => {
     }
 
     const { password: _, ...userWithoutPassword } = user.toObject();
-    res.json({ message: 'Login successful', user: userWithoutPassword });
+    res.status(200).json({ message: 'Login successful', user: userWithoutPassword });
+    return; // <-- explicitly return to avoid ambiguity
   } catch (err: any) {
     res.status(500).json({ error: err.message });
+    return; // <-- also explicitly return here
   }
 };
-// routes/userRoutes.ts
-router.get('/login', loginHandler);// DELETE /api/users/:id - Delete user by id
+
+router.post('/login', loginHandler);
+// DELETE /api/users/:id - Delete user by id
 const deleteUser: RequestHandler = async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.params.id);
