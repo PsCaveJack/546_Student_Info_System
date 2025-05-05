@@ -33,7 +33,6 @@ import courseRoutes from './routes/courseRoutes';
 import sectionRoutes from './routes/sectionRoutes';
 import registrationRoutes from './routes/registrationRoutes';
 import majorRoutes from './routes/majorRoutes';
-
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/sections', sectionRoutes);
