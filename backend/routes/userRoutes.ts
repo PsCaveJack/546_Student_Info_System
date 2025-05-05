@@ -1,7 +1,7 @@
 // routes/userRoutes.ts
 import express, { RequestHandler } from 'express';
 import User, { IUser } from '../models/User';
-
+import CourseHistory, { ICourseHistory } from '../models/CourseHistory';
 const router = express.Router();
 
 // GET /api/users - Get all users
@@ -50,8 +50,7 @@ const loginHandler: RequestHandler = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
-// Update the router to use GET instead of POST
+// routes/userRoutes.ts
 router.get('/login', loginHandler);// DELETE /api/users/:id - Delete user by id
 const deleteUser: RequestHandler = async (req, res) => {
   try {
@@ -66,8 +65,23 @@ const deleteUser: RequestHandler = async (req, res) => {
   }
 };
 router.delete('/:id', deleteUser);
-
-// PUT /api/users/:id/role - Update roles
+// backend/routes/courseHistoryRoutes.ts
+// Get course history for a user (you can adjust this based on your requirements)
+interface Params {
+  userId: string;
+}
+router.get('/course-history', async (req, res) => {
+  try {
+    const courses = await CourseHistory.find(); // Modify query if needed
+    res.status(200).json(courses);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: 'Failed to load course history', error: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error occurred' });
+    }
+  }
+});
 const updateRole: RequestHandler = async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(
