@@ -2,6 +2,9 @@ import dotenv from 'dotenv';
 import express, { Application, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import graduationRoutes from "./routes/graduationRoutes";
+import professorRoutes from './routes/professorRoutes';
+
 
 // Load environment variables
 dotenv.config();
@@ -11,6 +14,8 @@ const app: Application = express();
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use("/api/graduation-check", graduationRoutes);
+app.use('/api/professor', professorRoutes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI || '', {})
@@ -39,4 +44,3 @@ const PORT = process.argv[2] || process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
-
