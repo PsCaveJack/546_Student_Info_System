@@ -18,7 +18,6 @@ export interface Section {
     updatedAt?: string;
   }
   
-=======
 export interface Schedule {
   days: string[];
   time: string;
