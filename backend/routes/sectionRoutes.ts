@@ -27,6 +27,7 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 
+
 //Uses sectionID to get section information
 router.get('/:id/details', async (req: Request, res: Response): Promise<void> => {
   try {
@@ -95,5 +96,40 @@ router.put('/:id/grades', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to update grades' });
   }
 });
+=======
+router.put('/:id', async (req: Request, res: Response) => {
+  try {
+    const section: ISection | null = await Section.findByIdAndUpdate(
+      req.params.id
+    , req.body);
+    if (section) {
+      res.json(section);
+    }
+    else {
+      res.status(404)
+    }
+    
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE specific course by courseCode
+router.delete('/:id', async (req: Request, res: Response) => {
+  try {
+    const deletedSection = await Section.findByIdAndDelete(
+      req.params.id
+    );
+    if (deletedSection) {
+      res.json(deletedSection);
+    }
+    else {
+      res.status(404)
+    }
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
 
