@@ -96,7 +96,7 @@ router.put('/:id/grades', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to update grades' });
   }
 });
-=======
+
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const section: ISection | null = await Section.findByIdAndUpdate(
