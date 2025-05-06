@@ -59,6 +59,7 @@ router.post('/login', loginHandler);
 interface Params {
   userId: string;
 }
+
 router.get('/course-history', async (req, res) => {
   try {
     const courses = await CourseHistory.find(); // Modify query if needed
