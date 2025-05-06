@@ -28,7 +28,7 @@ export default function ClassSearchPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [user, setUser] = useAtom(userAtom);
-  const studentId = user!._id;
+  const studentId = (user) ? user!._id : "";
 
   const filteredSections = sections.data?.filter((section: Section) => {
     const query = searchTerm.toLowerCase();
