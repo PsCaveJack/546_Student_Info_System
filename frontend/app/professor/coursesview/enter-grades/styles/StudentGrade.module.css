@@ -1,0 +1,51 @@
+.studentItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.studentItem:last-child {
+  border-bottom: none;
+}
+
+.studentName {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* dropdown */
+.gradeSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+
+/* warning */
+.gradeChanged {
+  color: #ef4444;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.gradeLabel {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: white;
+  cursor: pointer;
+  width: 150px;
+}
+
+.selectChanged {
+  border-color: #ef4444;
+}
