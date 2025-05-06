@@ -4,17 +4,16 @@ import { ReactNode, useEffect, useState } from 'react';
 import { Drawer, AppBar, Toolbar, List, ListItem, ListItemText, IconButton, Typography, Box } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useAtom } from 'jotai';
+import { usePathname, useRouter } from 'next/navigation';
 import { userAtom } from '@/storage/user';
-import { useRouter } from 'next/navigation';
+import { useAtom } from 'jotai';
 
 
-interface StudentLayoutProps {
+interface ProfessorLayoutProps {
   children: ReactNode;
 }
 
-const StudentLayout = ({ children }: StudentLayoutProps) => {
+const ProfessorLayout = ({ children }: ProfessorLayoutProps) => {
 
   const [open, setOpen] = useState(false);
 
@@ -26,17 +25,14 @@ const StudentLayout = ({ children }: StudentLayoutProps) => {
 
   const getPageTitle = () => {
     switch (pathname) {
-      case '/student/class-control':
-        return 'Active Classes';
-      case '/student/class-search':
-        return 'Search and Enroll Classes';
-      case '/student/course-history':
-        return "Course History";
+      case '/professor/coursesview':
+        return 'Courses';
+      case '/professor/studentview':
+        return 'Students';
       default:
-        return 'Student Dashboard';
+        return 'Professor Dashboard';
     }
   };
-
 
   const [user] = useAtom(userAtom);
   const router = useRouter();
@@ -45,10 +41,11 @@ const StudentLayout = ({ children }: StudentLayoutProps) => {
     if (!user) {
       router.replace('/');
     }
-    else if(user.role !== 'student') {
+    else if(user.role !== 'professor') {
       router.replace('/loading');
     }
   }, [user]);
+
   return (
     <Box >
       {/* AppBar (top bar) */}
@@ -89,18 +86,13 @@ const StudentLayout = ({ children }: StudentLayoutProps) => {
         <Box sx={{ width: 240 }}>
           <List>
             <ListItem component="button">
-              <Link href="/student/class-control" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <ListItemText primary="Active Classes" />
+              <Link href="/professor/coursesview" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <ListItemText primary="Courses" />
               </Link>
             </ListItem>
             <ListItem component="button">
-              <Link href="/student/class-search" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <ListItemText primary="Search and Enroll" />
-              </Link>
-            </ListItem>
-            <ListItem component="button">
-              <Link href="/student/course-history" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <ListItemText primary="Course History" />
+              <Link href="/professor/studentview" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <ListItemText primary="Students" />
               </Link>
             </ListItem>
           </List>
@@ -115,4 +107,4 @@ const StudentLayout = ({ children }: StudentLayoutProps) => {
   );
 };
 
-export default StudentLayout;
+export default ProfessorLayout;

@@ -1,21 +1,24 @@
 'use client';
+import { userAtom } from '@/storage/user';
+import { useAtom } from 'jotai';
 import React, { useEffect, useState } from 'react';
 const CourseHistoryPage = () => {
   const [courses, setCourses] = useState<any[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const next_api = process.env.NEXT_PUBLIC_API_BASE;
+
+  const [storedUser, setUser] = useAtom(userAtom);
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    
     if (!storedUser) {
       setError('Not logged in.');
       setLoading(false);
       return;
     }
-    const { _id } = JSON.parse(storedUser); // assuming backend returns _id
     const fetchCourses = async () => {
       try {
-        const res = await fetch(`${next_api}/course-history/${_id}`);
+        const res = await fetch(`${next_api}/users/course-history/${storedUser._id}`);
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data.error || 'Failed to fetch course history');

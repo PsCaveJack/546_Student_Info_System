@@ -1,4 +1,6 @@
 'use client';
+import { userAtom } from '@/storage/user';
+import { useAtom } from 'jotai';
 import React, { useState, useEffect } from 'react';
 
 interface Student {
@@ -39,8 +41,9 @@ export const ProfessorStudentList: React.FC = () => {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
+  const [user, setUser] = useAtom(userAtom);
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
-  const professorId = '67f3888bcfae5e70ec67198a';
+  const professorId = (user) ? user._id : "";
 
   useEffect(() => {
     fetchStudents();

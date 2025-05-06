@@ -8,9 +8,11 @@ import { useState } from "react";
 import useSWR from "swr";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ClassEnrollInfo from "@/components/classes/ClassEnrollInfo";
+import { useAtom } from "jotai";
+import { userAtom } from "@/storage/user";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
-const studentId = "67f38885cfae5e70ec671986";
+
 
 export default function ClassSearchPage() {
   const sections = useSWR(`${API_BASE}/sections`, dataFetcher);
@@ -25,13 +27,15 @@ export default function ClassSearchPage() {
 
   const [error, setError] = useState<string | null>(null);
 
+  const [user, setUser] = useAtom(userAtom);
+  const studentId = (user) ? user!._id : "";
+
   const filteredSections = sections.data?.filter((section: Section) => {
     const query = searchTerm.toLowerCase();
 
     const matchingSeason = (season !== "") ? section.semester.includes(season) : true;
     const matchingYear = (year !== "") ? section.semester.includes(year) : true;
 
-    console.log("year included in " + section.courseCode + " is " +matchingYear)
     return (
       section.courseCode.toString().includes(query) && matchingSeason && matchingYear
     );

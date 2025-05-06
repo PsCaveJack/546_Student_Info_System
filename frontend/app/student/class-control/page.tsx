@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { fetchStudentActiveClasses } from "@/fetchers/classFetchers";
 import { dropClass } from "@/handlers/classHandlers";
+import { useAtom } from "jotai";
+import { userAtom } from "@/storage/user";
 
 // Replace this with session-based ID later
-const studentId = "67f38885cfae5e70ec671986";
+
 
 export default function ClassControlPage() {
   const [classes, setClasses] = useState<any[]>([]);
@@ -18,6 +20,9 @@ export default function ClassControlPage() {
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [studentInfo, setStudentInfo] = useState<any>(null);
 
+  const [user, setUser] = useAtom(userAtom);
+  const studentId = user?._id;
+
   useEffect(() => {
     loadClasses();
   }, []);
@@ -26,15 +31,17 @@ export default function ClassControlPage() {
     setLoading(true);
     setError(null);
     setErrorDetails(null);
-    try {
-      const data = await fetchStudentActiveClasses(studentId);
-      setClasses(data);
-    } catch (err: any) {
-      console.error("Failed to load classes:", err);
-      setError("Failed to load your classes");
-      setErrorDetails(err.message || "Please try again or contact support if the issue persists.");
-    } finally {
-      setLoading(false);
+    if (studentId){
+      try {
+        const data = await fetchStudentActiveClasses(studentId);
+        setClasses(data);
+      } catch (err: any) {
+        console.error("Failed to load classes:", err);
+        setError("Failed to load your classes");
+        setErrorDetails(err.message || "Please try again or contact support if the issue persists.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
