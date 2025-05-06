@@ -3,48 +3,59 @@
 import React from 'react';
 import styles from './styles/StudentGrade.module.css';
 
-export type Student = {
+export interface Student {
   _id: string;
   firstName: string;
   lastName: string;
-  grade?: string;
-};
+  grade: string;
+  registrationId?: string;
+}
 
-interface Props {
+interface StudentGradeProps {
   student: Student;
   originalGrade: string;
   gradeOptions: string[];
-  onChange: (id: string, grade: string) => void;
+  onChange: (id: string, newGrade: string) => void;
 }
 
 export default function StudentGrade({
   student,
   originalGrade,
   gradeOptions,
-  onChange,
-}: Props) {
-  const current = student.grade || '';
-  const changed = originalGrade !== current;
+  onChange
+}: StudentGradeProps) {
+  const hasChanged = student.grade !== originalGrade;
 
 
-  //UI
+
+
+  
+//UI
   return (
-    <li key={student._id} className={styles.studentItem}>
+    <li className={styles.studentItem}>
       <span className={styles.studentName}>
         {student.firstName} {student.lastName}
       </span>
+
       <div className={styles.gradeSection}>
-        {changed && <span className={styles.changedTag}>Grade changed</span>}
-        <label className={styles.gradeLabel}>Grade:</label>
+        {hasChanged && (
+          <span className={styles.gradeChanged}>
+            Grade changed
+          </span>
+        )}
+        <label className={styles.gradeLabel} htmlFor={student._id}>
+          Grade:
+        </label>
         <select
-          value={current}
+          id={student._id}
+          className={`${styles.select} ${hasChanged ? styles.selectChanged : ''}`}
+          value={student.grade}
           onChange={e => onChange(student._id, e.target.value)}
-          className={`${styles.select} ${changed ? styles.selectChanged : ''}`}
         >
-          <option value="">Select grade</option>
-          {gradeOptions.map(g => (
-            <option key={g} value={g}>
-              {g}
+          <option value="">--</option>
+          {gradeOptions.map(opt => (
+            <option key={opt} value={opt}>
+              {opt}
             </option>
           ))}
         </select>

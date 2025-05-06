@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import styles from './styles/page.module.css';
 import StudentGrade, { Student } from './StudentGrades';
 
-type CourseInfo = {
+interface CourseInfo {
   courseCode: string;
   courseName: string;
-};
+}
 
 export default function EnterGradesPage() {
   const sectionId = useSearchParams().get('sectionId');
@@ -23,44 +23,68 @@ export default function EnterGradesPage() {
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5050/api';
 
-
-
   useEffect(() => {
     if (!sectionId) return;
 
-    // get sectionId from URL
+    // fetch course info and students with this sectionId
     axios
-      .get<CourseInfo>(`${API_BASE}/course-grades/${sectionId}/info`)
-      .then(res => setCourseInfo(res.data))
-      .catch(() => setCourseInfo({ courseCode: '', courseName: '' }));
-
-    // Use URL to find students
-    axios
-      .get<Student[]>(`${API_BASE}/course-grades/${sectionId}/students`)
+      .get<{
+        courseCode: string;
+        courseName: string;
+        students: Array<{
+          registrationId: string;
+          firstName: string;
+          lastName: string;
+          grade: string | null;
+        }>;
+      }>(`${API_BASE}/sections/${sectionId}/details`)//gets sctionId from URL
+    //store courseCode and courseName
       .then(res => {
-        setStudents(res.data);
+        setCourseInfo({
+          courseCode: res.data.courseCode,
+          courseName: res.data.courseName
+        });
+
+        //Student type
+        const list: Student[] = res.data.students.map(entry => ({
+          _id:       entry.registrationId,
+          firstName: entry.firstName,
+          lastName:  entry.lastName,
+          grade:     entry.grade || ''
+        }));
+
+        setStudents(list);
+
+        // Stores current grade
         const init: Record<string, string> = {};
-        res.data.forEach(s => (init[s._id] = s.grade || ''));
+        list.forEach(s => {
+          init[s._id] = s.grade;
+        });
         setOriginalGrades(init);
       })
-      .catch(() => alert('Could not load student list.'))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        alert('Could not load section details.');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [API_BASE, sectionId]);
 
-
-
+//changing grade
   const handleGradeChange = (id: string, newGrade: string) => {
-    setStudents(prev => prev.map(s => (s._id === id ? { ...s, grade: newGrade } : s)));
+    setStudents(prev =>
+      prev.map(s => (s._id === id ? { ...s, grade: newGrade } : s))
+    );
   };
-
-//Update grades
+//Submit
   const handleSubmit = async () => {
-    const payload = { students: students.map(s => ({ _id: s._id, grade: s.grade || '' })) };
+    if (!sectionId) return;
+    const payload = { students: students.map(s => ({ _id: s._id, grade: s.grade })) };
     try {
-      await axios.put(`${API_BASE}/course-grades/${sectionId}/grades`, payload);
+      await axios.put(`${API_BASE}/sections/${sectionId}/grades`, payload);
       alert('Grades submitted!');
     } catch {
-      alert('Failed to change grades.');
+      alert('Failed to submit grades.');
     }
   };
 
@@ -72,14 +96,12 @@ export default function EnterGradesPage() {
 
 
 
-
-//UI
+  //UI
   return (
-    
     <main className={styles.container}>
       <header className={styles.header}>
         <div className={styles.headerTitles}>
-          <h1 className={styles.mainTitle}>Grades</h1>
+          <h1 className={styles.mainTitle}>Enter Grades</h1>
           {courseInfo && (
             <h2 className={styles.subTitle}>
               {courseInfo.courseCode} – {courseInfo.courseName}
@@ -87,7 +109,6 @@ export default function EnterGradesPage() {
           )}
         </div>
       </header>
-
 
       <input
         className={styles.searchInput}
@@ -100,15 +121,20 @@ export default function EnterGradesPage() {
       {loading ? (
         <p>Loading students…</p>
       ) : filtered.length === 0 ? (
-        <p>No matching students found.</p>
+        <p>No students.</p>
       ) : (
-        <form onSubmit={e => { e.preventDefault(); handleSubmit(); }}>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
           <ul className={styles.studentList}>
             {filtered.map(student => (
               <StudentGrade
                 key={student._id}
                 student={student}
-                originalGrade={originalGrades[student._id] || ''}
+                originalGrade={originalGrades[student._id]}
                 gradeOptions={gradeOptions}
                 onChange={handleGradeChange}
               />
