@@ -4,7 +4,6 @@ export interface ICourseHistory {
   courseCode: string;
   grade: string;
   credits: number;
-  sectionId: mongoose.Types.ObjectId;
 }
 
 export interface IScheduleEntry {
@@ -44,7 +43,6 @@ const UserSchema: Schema<IUser> = new Schema(
     schedule: [{ sectionId: { type: Schema.Types.ObjectId, ref: 'Section' } }],
     history: [
       {
-        sectionId:   { type: Schema.Types.ObjectId, ref: 'Course', required: true },
         courseCode: String,
         grade: String,
         credits: Number
