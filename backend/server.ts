@@ -31,7 +31,6 @@ import sectionRoutes from './routes/sectionRoutes';
 import registrationRoutes from './routes/registrationRoutes';
 import majorRoutes from './routes/majorRoutes';
 import graduationRoutes from "./routes/graduationRoutes";
-import entergradesRoute from "./routes/entergradesRoute";
 
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
@@ -39,7 +38,6 @@ app.use('/api/sections', sectionRoutes);
 app.use('/api/registrations', registrationRoutes);
 app.use('/api/majors', majorRoutes);
 app.use("/api/graduation-check", graduationRoutes);
-app.use('/api/course-grades', entergradesRoute);
 
 
 // Start the server
