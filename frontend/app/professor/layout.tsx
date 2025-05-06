@@ -86,12 +86,12 @@ const ProfessorLayout = ({ children }: ProfessorLayoutProps) => {
         <Box sx={{ width: 240 }}>
           <List>
             <ListItem component="button">
-              <Link href="/admin/coursesview" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link href="/professor/coursesview" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <ListItemText primary="Courses" />
               </Link>
             </ListItem>
             <ListItem component="button">
-              <Link href="/admin/studentview" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link href="/professor/studentview" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <ListItemText primary="Students" />
               </Link>
             </ListItem>

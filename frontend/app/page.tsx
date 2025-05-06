@@ -81,7 +81,7 @@ export default function LoginPage() {
 					className="w-full p-2 border rounded"
 				>
 					<option value="student">Student</option>
-					<option value="teacher">Teacher</option>
+					<option value="professor">Professor</option>
 					<option value="admin">Admin</option>
 				</select>
 				<button
