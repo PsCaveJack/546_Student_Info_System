@@ -1,18 +1,28 @@
-import Link from 'next/link';
+'use client';
+
 import React, { useEffect, useState } from "react";
-import { Section } from "@/types/sectionTypes";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAtom } from "jotai";
+import { userAtom } from "@/storage/user";
+import { Section } from "@/types/sectionTypes";
 import "./ViewSectionsPage.css";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5050/api";
 
 export default function ViewSectionsPage() {
+  const [user] = useAtom(userAtom);
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
+    if (!user) {
+      router.push("/"); // Redirect to login if not logged in
+      return;
+    }
+
     const fetchSections = async () => {
       try {
         const res = await fetch(`${API_BASE}/sections`);
@@ -20,7 +30,13 @@ export default function ViewSectionsPage() {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
         const data: Section[] = await res.json();
-        setSections(data);
+
+        // Filter by instructor (e.g., username or email depending on how it's stored)
+        const professorSections = data.filter(
+          section => section.instructor.toLowerCase() === user.username?.toLowerCase() // or user.email
+        );
+
+        setSections(professorSections);
       } catch (err: any) {
         console.error("Fetch error:", err);
         setError(err.message || "Something went wrong");
@@ -30,7 +46,7 @@ export default function ViewSectionsPage() {
     };
 
     fetchSections();
-  }, []);
+  }, [user, router]);
 
   const handleViewStudents = (courseCode: string) => {
     router.push(`/professor/course/${courseCode}/students`);
@@ -43,7 +59,7 @@ export default function ViewSectionsPage() {
       {loading && <p>Loading sections...</p>}
       {error && <p className="error-message">Error: {error}</p>}
       {!loading && !error && sections.length === 0 && (
-        <p>No sections found.</p>
+        <p>No sections found for you.</p>
       )}
 
       <ul className="sections-list">
