@@ -1,16 +1,16 @@
 "use client";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
-
-
 import React, { useEffect, useState } from "react";
-import { Course } from "@/types/classTypes"; // adjust path as needed
+import { Course } from "@/types/classTypes";
+import { useRouter } from "next/navigation";
 import "./ViewCoursesPage.css";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE
 
 export default function ViewCoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter(); // Initialize the router
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -28,20 +28,22 @@ export default function ViewCoursesPage() {
         setLoading(false);
       }
     };
-
     fetchCourses();
   }, []);
+
+  // Function to navigate to course students page
+  const handleViewStudents = (courseCode: string) => {
+    router.push(`/professor/course/${courseCode}/students`);
+  };
 
   return (
     <div className="courses-container">
       <h1 className="courses-heading">My Courses</h1>
-
       {loading && <p>Loading courses...</p>}
       {error && <p className="error-message">Error: {error}</p>}
       {!loading && !error && courses.length === 0 && (
         <p>No courses found.</p>
       )}
-
       <ul className="courses-list">
         {courses.map((course) => (
           <li key={course.courseCode} className="course-item">
@@ -50,7 +52,12 @@ export default function ViewCoursesPage() {
             <p><strong>Course Name:</strong> {course.courseName}</p>
             <p><strong>Description:</strong> {course.description}</p>
             <div className="button-group">
-              <button className="course-button">View Students</button>
+              <button 
+                className="course-button"
+                onClick={() => handleViewStudents(course.courseCode)}
+              >
+                View Students
+              </button>
               <button className="course-button">View Grades</button>
             </div>
           </li>
