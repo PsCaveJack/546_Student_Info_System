@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import Section, { ISection } from '../models/Section';
 import Course from '../models/Course';
 import Registration from '../models/Registration';
+import User from '../models/User';
 
 const router = express.Router();
 
@@ -49,7 +50,7 @@ router.get('/:id/details', async (req: Request, res: Response): Promise<void> =>
 
     // in Registration find matching sectionID, gets student ID.
     // Get studnet name from Users with that id
-    const regs = await Registration.find({ sectionId: id, status: 'enrolled' })
+    const regs = await Registration.find({ sectionId: id })
     .populate<{
       studentId: { _id: string; firstName: string; lastName: string }
     }>(
@@ -84,10 +85,53 @@ router.put('/:id/grades', async (req: Request, res: Response) => {
   try {
     const updates: { _id: string; grade: string }[] = req.body.students;
 
+    if (updates.length == 0)
+      return;
+
+    // finding section Id -> coursecode -> units defined in course object
+    // section should be the same across all registrations
+    const firstRegistrationInfo = await Registration.findById(updates[0]._id).select("sectionId")
+
+    if (!firstRegistrationInfo)
+      return;
+
+    const sectionInfo = await Section.findById(firstRegistrationInfo.sectionId).select("courseCode")
+
+    if (!sectionInfo)
+      return;
+
+    // THEN... we can now find the amount of units this course has
+    const courseInfo = await Course.findOne({courseCode: sectionInfo.courseCode}, "units");
+
+    if (!courseInfo)
+      return;
+
+    console.log("Course for grades", courseInfo)
+
     await Promise.all(
-      updates.map(u =>
-        Registration.findByIdAndUpdate(u._id, { grade: u.grade })
-      )
+      updates.map(async u => {
+        const registration = await Registration.findById(u._id).select("studentId sectionId")
+        
+        if (!registration) 
+          return;
+
+        const studentId = registration.studentId;
+        
+        await Registration.findByIdAndUpdate(u._id, 
+          { grade: u.grade, status: "completed" }
+        )
+
+        // update user's course history
+        await User.findByIdAndUpdate(studentId, {
+          $push: {
+            history: {
+              courseCode: sectionInfo.courseCode,
+              grade: u.grade,
+              units: courseInfo.units,
+            }
+          }
+        });
+      })
     );
 
     res.json({ success: true });
