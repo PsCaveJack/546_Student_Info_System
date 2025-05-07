@@ -129,8 +129,11 @@ export default function ClassSearchPage() {
               open={detailsOpen}
               onClose={() => handleDetailsClose()}
             >
-              <ClassEnrollInfo section={sectionToEdit} userId={studentId} handleClose={handleDetailsClose} 
-                error={error} setError={setError}/>
+
+              {user && 
+                <ClassEnrollInfo section={sectionToEdit} user={user} handleClose={handleDetailsClose} 
+                  error={error} setError={setError}/>
+              }
             </Drawer>
           </>
         )

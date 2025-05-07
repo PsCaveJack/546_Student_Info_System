@@ -1,9 +1,12 @@
 import { dataFetcher } from "@/fetchers/classFetchers";
 import { checkPrerequisites } from "@/handlers/prerequisiteHandler";
+import { userAtom } from "@/storage/user";
 import { Course } from "@/types/classTypes";
 import { Section } from "@/types/sectionTypes";
+import { User } from "@/types/userTypes";
 import { Alert, Box, Button, Card, CardContent, Chip, Grid, Typography } from "@mui/material";
 import axios from "axios";
+import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useState } from "react";
 import useSWR from "swr";
 
@@ -11,13 +14,13 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api"
 
 interface ClassInfoParams {
   section?: Section
-  userId: string
+  user: User
   handleClose: () => void
   error: string | null
   setError: Dispatch<SetStateAction<string | null>>
 }
 
-const ClassEnrollInfo = (({section, userId, handleClose, error, setError}: ClassInfoParams) => {
+const ClassEnrollInfo = (({section, user, handleClose, error, setError}: ClassInfoParams) => {
   const course = (section) ? useSWR(`${API_BASE}/courses/${section?.courseCode}`, dataFetcher) : null;
 
   const courseData: Course = course?.data;
@@ -25,14 +28,17 @@ const ClassEnrollInfo = (({section, userId, handleClose, error, setError}: Class
   const enroll = async () => {
     
     //  TO-DO: get completed courses from user info
-    const completedPrerequisites = ["CSC100"];
+    const completedPrerequisites = user.history?.map(entry => entry.courseCode) || [];
     const hasPrerequisites = await checkPrerequisites(courseData.courseCode, completedPrerequisites);
 
-    if (hasPrerequisites && section){
+
+    console.log("completed prereq", completedPrerequisites);
+    console.log("user info", user);
+    if (hasPrerequisites && section && user._id){
       // make request to add section
       setError(null);
       const objectToPost = {
-        studentId: userId,
+        studentId: user._id,
         sectionId: section._id,
         status: "enrolled",
       }

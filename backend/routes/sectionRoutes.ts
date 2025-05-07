@@ -106,8 +106,12 @@ router.put('/:id/grades', async (req: Request, res: Response) => {
     if (!courseInfo)
       return;
 
-    console.log("Course for grades", courseInfo)
 
+    const units = courseInfo.units;
+    const courseCode = sectionInfo.courseCode;
+    console.log("Course for grades", courseCode);
+
+    console.log("units in course", units);
     await Promise.all(
       updates.map(async u => {
         const registration = await Registration.findById(u._id).select("studentId sectionId")
@@ -121,13 +125,20 @@ router.put('/:id/grades', async (req: Request, res: Response) => {
           { grade: u.grade, status: "completed" }
         )
 
+        // removes repetitive course history
+        await User.findByIdAndUpdate(studentId, {
+          $pull: {
+            history: { courseCode: courseCode }
+          }
+        });
+
         // update user's course history
         await User.findByIdAndUpdate(studentId, {
           $push: {
             history: {
-              courseCode: sectionInfo.courseCode,
+              courseCode: courseCode,
               grade: u.grade,
-              units: courseInfo.units,
+              credits: units,
             }
           }
         });
