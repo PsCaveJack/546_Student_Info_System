@@ -5,7 +5,7 @@ interface ProfessorLayoutProps {
   children: React.ReactNode;
 }
 
-const ProfessorLayout: React.FC<ProfessorLayoutProps> = ({ children }) => {
+const ProfessorStudentLayout: React.FC<ProfessorLayoutProps> = ({ children }) => {
   return (
     <div className="professor-layout">
       <nav className="professor-nav">
@@ -37,4 +37,4 @@ const ProfessorLayout: React.FC<ProfessorLayoutProps> = ({ children }) => {
   );
 };
 
-export default ProfessorLayout;
+export default ProfessorStudentLayout;

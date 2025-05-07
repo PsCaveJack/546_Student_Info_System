@@ -1,10 +1,12 @@
 "use client";
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Drawer, AppBar, Toolbar, List, ListItem, ListItemText, IconButton, Typography, Box } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { userAtom } from '@/storage/user';
+import { useAtom } from 'jotai';
 
 
 interface AdminLayoutProps {
@@ -35,6 +37,18 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         return 'Admin Dashboard';
     }
   };
+
+  const [user] = useAtom(userAtom);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.replace('/');
+    }
+    else if(user.role !== 'admin') {
+      router.replace('/loading');
+    }
+  }, [user]);
 
   return (
     <Box >
