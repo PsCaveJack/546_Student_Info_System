@@ -63,6 +63,7 @@ router.put('/:id/drop', async (req, res) => {
   }
 });
 
+//GET professors enrolled students
 router.get(
   '/professor/:professorId/students',
   (async (req: Request, res: Response) => {
@@ -72,7 +73,8 @@ router.get(
       if (!professor || professor.role !== 'professor') {
         return res.status(404).json({ error: 'Professor not found' });
       }
-      const professorSectionIds = professor.coursesTaught?.map(course => course.sectionId) || [];
+      const sections = await Section.find({ instructor: professor.username });
+      const professorSectionIds = sections.map(s => s._id);
       const enrollments = await Registration.find({
         sectionId: { $in: professorSectionIds },
         status: 'enrolled'
@@ -95,7 +97,7 @@ router.get(
         acc[studentIndex].enrolledCourses.push({
           sectionId: enrollment.sectionId._id,
           courseCode: enrollment.sectionId.courseCode,
-          courseName: ''  // Not available in current schema
+          courseName: '' 
         });
         return acc;
       }, []);
@@ -120,23 +122,31 @@ router.get(
       if (!student || student.role !== 'student') {
         return res.status(404).json({ error: 'Student not found' });
       }
-      const enrollmentHistory = await Registration.find({ studentId })
-        .populate('sectionId')
-        .sort('registrationDate');
-      const formattedHistory = enrollmentHistory.reduce((acc: any, enrollment: any) => {
-        const semester = enrollment.sectionId.semester || 'Unknown';
-        if (!acc[semester]) {
-          acc[semester] = [];
-        }
-        acc[semester].push({
-          courseCode: enrollment.sectionId.courseCode,
-          courseName: '',  // Not available in current schema
-          grade: enrollment.grade,
-          status: enrollment.status,
-          credits: 0  // Not available in current schema
-        });
-        return acc;
-      }, {});
+      const sections = await Section.find({ instructor: professor.username });
+      const professorSectionIds = sections.map(s => s._id);
+
+      const enrollmentHistory = await Registration.find({
+        studentId,
+        sectionId: { $in: professorSectionIds }
+      })
+      .populate('sectionId')
+      .sort('registrationDate');
+
+        const formattedHistory = enrollmentHistory.reduce((acc: any, enrollment: any) => {
+          const semester = enrollment.sectionId.semester || 'Unknown';
+          if (!acc[semester]) {
+            acc[semester] = [];
+          }
+          acc[semester].push({
+            courseCode: enrollment.sectionId.courseCode,
+            courseName: '',
+            grade: enrollment.grade,
+            status: enrollment.status,
+            credits: 0,
+            registrationId: enrollment._id 
+          });
+          return acc;
+        }, {});
       res.json({
         student: {
           _id: student._id,

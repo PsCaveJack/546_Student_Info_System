@@ -17,6 +17,7 @@ interface EnrollmentRecord {
   grade: string | null;
   status: string;
   credits?: number;
+  registrationId: string;
 }
 
 interface EnrollmentHistory {
@@ -40,6 +41,10 @@ export const ProfessorStudentList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Add states for drop functionality
+  const [showDropConfirmation, setShowDropConfirmation] = useState(false);
+  const [dropData, setDropData] = useState<{registrationId: string, courseCode: string, semester: string} | null>(null);
+  const [dropping, setDropping] = useState(false);
   
   const [user, setUser] = useAtom(userAtom);
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
@@ -78,6 +83,48 @@ export const ProfessorStudentList: React.FC = () => {
   const handleStudentClick = (student: Student) => {
     setSelectedStudent(student);
     fetchStudentHistory(student._id);
+  };
+
+  // Add drop functionality methods
+  const handleDropClick = (registrationId: string, courseCode: string, semester: string) => {
+    setDropData({ registrationId, courseCode, semester });
+    setShowDropConfirmation(true);
+  };
+
+  const confirmDrop = async () => {
+    if (!dropData) return;
+    
+    setDropping(true);
+    try {
+      const response = await fetch(`${API_BASE}/registrations/${dropData.registrationId}/drop`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to drop student');
+      }
+      
+      if (selectedStudent) {
+        fetchStudentHistory(selectedStudent._id);
+      }
+
+      fetchStudents();
+      
+    } catch (err: any) {
+      setError(`Failed to drop student: ${err.message}`);
+    } finally {
+      setDropping(false);
+      setShowDropConfirmation(false);
+      setDropData(null);
+    }
+  };
+
+  const cancelDrop = () => {
+    setShowDropConfirmation(false);
+    setDropData(null);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -228,6 +275,15 @@ export const ProfessorStudentList: React.FC = () => {
                             fontWeight: 600,
                             borderBottom: '2px solid #e5e7eb'
                           }}>Status</th>
+                          {/* Add Action column */}
+                          <th style={{
+                            background: '#f8fafc',
+                            color: '#374151',
+                            padding: '12px 16px',
+                            textAlign: 'center',
+                            fontWeight: 600,
+                            borderBottom: '2px solid #e5e7eb'
+                          }}>Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -248,6 +304,33 @@ export const ProfessorStudentList: React.FC = () => {
                               borderBottom: '1px solid #e5e7eb',
                               color: '#4b5563'
                             }}>{course.status}</td>
+                            {/* Add Drop button for enrolled courses */}
+                            <td style={{
+                              padding: '12px 16px',
+                              borderBottom: '1px solid #e5e7eb',
+                              textAlign: 'center'
+                            }}>
+                              {course.status === 'enrolled' && course.registrationId && (
+                                <button
+                                  onClick={() => handleDropClick(course.registrationId, course.courseCode, semester)}
+                                  style={{
+                                    backgroundColor: '#ef4444',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    padding: '6px 12px',
+                                    fontSize: '14px',
+                                    fontWeight: '500',
+                                    cursor: 'pointer',
+                                    transition: 'background-color 0.2s'
+                                  }}
+                                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
+                                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ef4444'}
+                                >
+                                  Drop
+                                </button>
+                              )}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -277,6 +360,103 @@ export const ProfessorStudentList: React.FC = () => {
         )}
       </div>
       
+      {/* Drop Confirmation Modal */}
+      {showDropConfirmation && dropData && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '24px',
+            width: '400px',
+            maxWidth: '90%',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+          }}>
+            <h3 style={{
+              color: '#111827',
+              fontSize: '20px',
+              marginBottom: '16px',
+              fontWeight: 600
+            }}>Confirm Drop</h3>
+            
+            <p style={{
+              color: '#4b5563',
+              marginBottom: '24px'
+            }}>
+              Are you sure you want to drop {selectedStudent?.firstName} {selectedStudent?.lastName} from {dropData.courseCode} ({dropData.semester})?
+            </p>
+            
+            <div style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '12px'
+            }}>
+              <button
+                onClick={cancelDrop}
+                disabled={dropping}
+                style={{
+                  backgroundColor: '#f3f4f6',
+                  color: '#374151',
+                  border: 'none',
+                  borderRadius: '4px',
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: dropping ? 'not-allowed' : 'pointer',
+                  opacity: dropping ? 0.7 : 1
+                }}
+              >
+                Cancel
+              </button>
+              
+              <button
+                onClick={confirmDrop}
+                disabled={dropping}
+                style={{
+                  backgroundColor: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: dropping ? 'not-allowed' : 'pointer',
+                  opacity: dropping ? 0.7 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                {dropping ? (
+                  <>
+                    <span style={{
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid #f3f4f6',
+                      borderTop: '2px solid transparent',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite',
+                      marginRight: '8px'
+                    }}></span>
+                    Dropping...
+                  </>
+                ) : 'Confirm Drop'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <style jsx>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
@@ -285,6 +465,6 @@ export const ProfessorStudentList: React.FC = () => {
       `}</style>
     </div>
   );
-  };
-  
-  export default ProfessorStudentList;
+};
+
+export default ProfessorStudentList;

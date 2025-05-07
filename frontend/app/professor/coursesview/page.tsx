@@ -1,7 +1,7 @@
-"use client";
 import Link from 'next/link';
 import React, { useEffect, useState } from "react";
-import { Section } from "@/types/sectionTypes"; // make sure this file exists
+import { Section } from "@/types/sectionTypes";
+import { useRouter } from "next/navigation";
 import "./ViewSectionsPage.css";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5050/api";
@@ -10,6 +10,7 @@ export default function ViewSectionsPage() {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchSections = async () => {
@@ -30,6 +31,10 @@ export default function ViewSectionsPage() {
 
     fetchSections();
   }, []);
+
+  const handleViewStudents = (courseCode: string) => {
+    router.push(`/professor/course/${courseCode}/students`);
+  };
 
   return (
     <div className="sections-container">
@@ -53,7 +58,10 @@ export default function ViewSectionsPage() {
               <strong>Schedule:</strong> {section.schedule.days.join(', ')} @ {section.schedule.time}
             </p>
             <div className="button-group">
-              <button className="section-button">
+              <button
+                className="section-button"
+                onClick={() => handleViewStudents(section.courseCode)}
+              >
                 View Students
               </button>
               <Link
