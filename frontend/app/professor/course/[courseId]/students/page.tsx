@@ -2,7 +2,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import ProfessorLayout from '../../../../../components/layout/ProfessorLayout';
 
 interface Student {
     _id: string;
@@ -297,7 +296,7 @@ export default function CourseStudentList() {
   };
 
   return (
-    <ProfessorLayout>
+    <>
       <PageContent />
       
       {/* Drop Confirmation Modal */}
@@ -403,6 +402,6 @@ export default function CourseStudentList() {
           100% { transform: rotate(360deg); }
         }
       `}</style>
-    </ProfessorLayout>
+    </>
   );
 }
