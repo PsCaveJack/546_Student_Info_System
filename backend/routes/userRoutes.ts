@@ -85,6 +85,7 @@ router.get('/course-history', async (req, res) => {
     }
   }
 });
+
 const updateRole: RequestHandler = async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(
