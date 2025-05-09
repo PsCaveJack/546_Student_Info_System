@@ -4,6 +4,7 @@ import useSWR from 'swr'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://your-api.com'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
