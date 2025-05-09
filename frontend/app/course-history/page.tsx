@@ -1,56 +1,97 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-const CourseHistoryPage = () => {
-  const [courses, setCourses] = useState<any[]>([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
-  const next_api = process.env.NEXT_PUBLIC_API_BASE;
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (!storedUser) {
-      setError('Not logged in.');
-      setLoading(false);
-      return;
-    }
-    const { _id } = JSON.parse(storedUser); // assuming backend returns _id
-    const fetchCourses = async () => {
-      try {
-        const res = await fetch(`${next_api}/course-history/${_id}`);
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error || 'Failed to fetch course history');
-        }
-        setCourses(data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCourses();
-  }, []);
-  if (loading) return <p className="p-8 text-center">Loading...</p>;
-  return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Course History</h1>
-      {error ? (
-        <p className="text-red-500">{error}</p>
-      ) : courses.length === 0 ? (
-        <p>No courses found.</p>
-      ) : (
-        <ul className="space-y-4">
-          {courses.map((course: any, index: number) => (
-            <li key={index} className="border p-4 rounded shadow">
-              <h2 className="text-lg font-semibold">{course.courseName}</h2>
-              <p>Semester: {course.semester}</p>
-              <p>Grade: {course.grade}</p>
-              <p>Year: {course.year}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-};
-export default CourseHistoryPage;
-                                      
+'use client'
+import { userAtom } from '@/storage/user';
+import { useAtom } from 'jotai';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+
+export default function LoginPage() {
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [role, setRole] = useState('student'); // <-- added role selection
+	const [error, setError] = useState('');
+	const next_api = process.env.NEXT_PUBLIC_API_BASE;
+
+	const [user, setUser] = useAtom(userAtom)
+	const router = useRouter();
+	
+	const handleLogin = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setError('');
+
+		try {
+			const res = await fetch(${next_api}/users/login, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ email, password, role }),
+			});    
+			
+			const responseText = await res.text();
+
+			if (!res.ok) {
+				throw new Error('Failed to load JSON response');
+			}
+
+			const data = JSON.parse(responseText);
+			
+			if(data.message === "Login successful"){
+				setUser(data.user);
+			}
+			
+
+			// Save user or redirect here
+		} catch (err: any) {
+			console.error('Login error:', err);
+			setError(err.message);
+		}
+	};
+
+	useEffect(() => {
+		if(user !== null){
+			router.replace('/loading');
+		}
+	}, [user])
+
+	return (
+		<div className="p-8 max-w-md mx-auto">
+			<h1 className="text-2xl font-bold mb-4">Login</h1>
+			<form onSubmit={handleLogin} className="space-y-4">
+				<input
+					type="email"
+					placeholder="Email"
+					className="w-full p-2 border rounded"
+					value={email}
+					onChange={e => setEmail(e.target.value)}
+					required
+				/>
+				<input
+					type="password"
+					placeholder="Password"
+					className="w-full p-2 border rounded"
+					value={password}
+					onChange={e => setPassword(e.target.value)}
+					required
+				/>
+				<select
+					value={role}
+					onChange={e => setRole(e.target.value)}
+					className="w-full p-2 border rounded"
+				>
+					<option value="student">Student</option>
+					<option value="professor">Professor</option>
+					<option value="admin">Admin</option>
+				</select>
+				<button
+					type="submit"
+					className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+				>
+					Login
+				</button>
+				{error && <p className="text-red-500">{error}</p>}
+			</form>
+		</div>
+	);
+
+}

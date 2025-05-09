@@ -1,10 +1,13 @@
 "use client";
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Drawer, AppBar, Toolbar, List, ListItem, ListItemText, IconButton, Typography, Box } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAtom } from 'jotai';
+import { userAtom } from '@/storage/user';
+import { useRouter } from 'next/navigation';
 
 
 interface StudentLayoutProps {
@@ -27,11 +30,25 @@ const StudentLayout = ({ children }: StudentLayoutProps) => {
         return 'Active Classes';
       case '/student/class-search':
         return 'Search and Enroll Classes';
+      case '/student/course-history':
+        return "Course History";
       default:
         return 'Student Dashboard';
     }
   };
 
+
+  const [user] = useAtom(userAtom);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.replace('/');
+    }
+    else if(user.role !== 'student') {
+      router.replace('/loading');
+    }
+  }, [user]);
   return (
     <Box >
       {/* AppBar (top bar) */}
@@ -79,6 +96,11 @@ const StudentLayout = ({ children }: StudentLayoutProps) => {
             <ListItem component="button">
               <Link href="/student/class-search" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <ListItemText primary="Search and Enroll" />
+              </Link>
+            </ListItem>
+            <ListItem component="button">
+              <Link href="/student/course-history" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <ListItemText primary="Course History" />
               </Link>
             </ListItem>
           </List>
