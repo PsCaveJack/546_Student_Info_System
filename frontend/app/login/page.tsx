@@ -4,7 +4,7 @@ import { userAtom } from '@/storage/user';
 import { useAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+
 
 export default function LoginPage() {
 	const [email, setEmail] = useState('');
