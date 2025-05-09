@@ -18,13 +18,13 @@ export default function LoadingPage() {
     }
     if (user !== null){
       if (user.role === 'student') {
-        router.replace('/student/class-control'); // or '/' or '/login'
+        router.replace('/student/dashBoard'); // or '/' or '/login'
       }
       else if(user.role === 'professor') {
-        router.replace('/professor/coursesview'); // or '/' or '/login'
+        router.replace('/professor/dashBoard'); // or '/' or '/login'
       }
       else if(user.role === 'admin') {
-        router.replace('/admin/account-control'); // or '/' or '/login'
+        router.replace('/admin/dashBoard'); // or '/' or '/login'
       }
     }
   }, [user]);
